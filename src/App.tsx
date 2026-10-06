@@ -818,61 +818,70 @@ function HomePage() {
 
       {/* HERO */}
 
-      <section className="relative h-[100svh] min-h-[680px] overflow-hidden bg-[#101b18]">
-        <video
-          className="absolute inset-0 h-full w-full object-cover object-[center_70%] sm:object-[center_25%] lg:object-[center_20%]"
-          src={heroVideo}
-          autoPlay
-          muted={!soundOn}
-          loop
-          playsInline
-          preload="auto"
-        />
+<section className="relative h-[100svh] min-h-[680px] overflow-hidden bg-[#101b18]">
+  <video
+    className="absolute inset-0 h-full w-full object-cover object-[center_70%] sm:object-[center_25%] lg:object-[center_20%]"
+    src={heroVideo}
+    autoPlay
+    muted={!soundOn}
+    loop
+    playsInline
+    preload="auto"
+  />
 
-        <div className="absolute inset-0 bg-black/30" />
+  <div className="absolute inset-0 bg-black/30" />
 
-        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/65 via-black/20 to-transparent" />
+  <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/65 via-black/20 to-transparent" />
 
-        <div className="relative z-10 mx-auto flex h-full max-w-[1500px] items-end px-6 pb-24 sm:px-10 sm:pb-28 lg:px-16 lg:pb-32">
-          <div className="max-w-4xl">
-            <p className="mb-6 text-[10px] uppercase tracking-[0.35em] text-white/70 sm:text-xs">
-              FOBCA LIMITED
-            </p>
+  <div className="relative z-10 mx-auto flex h-full max-w-[1500px] items-end px-6 pb-24 sm:px-10 sm:pb-28 lg:px-16 lg:pb-32">
+    <div className="max-w-4xl">
+      <p className="mb-6 text-[10px] uppercase tracking-[0.35em] text-white/70 sm:text-xs">
+        FOBCA LIMITED
+      </p>
 
-            <h1 className="max-w-4xl font-serif text-5xl leading-[0.95] tracking-[-0.04em] text-white sm:text-6xl md:text-7xl lg:text-[100px]">
-              We realize
-              <br />
-              <span className="italic font-light">your dreams.</span>
-            </h1>
+      <h1 className="max-w-4xl font-serif text-5xl leading-[0.95] tracking-[-0.04em] text-white sm:text-6xl md:text-7xl lg:text-[100px]">
+        We realize
+        <br />
+        <span className="font-light italic">your dreams.</span>
+      </h1>
 
-            <div className="mt-8 flex max-w-xl items-start gap-5">
-              <span className="mt-2 h-px w-12 shrink-0 bg-white/60" />
-            </div>
-          </div>
-        </div>
+      <div className="mt-8 flex max-w-xl items-start gap-5">
+        <span className="mt-2 h-px w-12 shrink-0 bg-white/60" />
+      </div>
 
-        <button
-          onClick={toggleSound}
-          aria-label={soundOn ? "Mute video" : "Turn video sound on"}
-          className="absolute bottom-8 right-6 z-20 flex items-center gap-3 border border-white/30 px-4 py-1 text-[9px] uppercase tracking-[0.18em] text-white/80 backdrop-blur-sm transition hover:border-white hover:text-white sm:right-10 lg:right-16"
-        >
-          <span
-            className={`h-1.5 w-1.5 rounded-full ${
-              soundOn ? "bg-white" : "border border-white/70"
-            }`}
-          />
+      {/* FURNITURE CTA */}
+      <button
+  onClick={() => navigate("/furniture")}
+  className="mt-8 inline-flex items-center gap-5 bg-white/80 px-6 py-4 text-[10px] uppercase tracking-[0.2em] text-[#101b18] transition duration-300 hover:bg-white"
+>
+  Explore Furniture
+  <span className="text-base leading-none">→</span>
+</button>
+    </div>
+  </div>
 
-          {soundOn ? "Sound On" : "Sound Off"}
-        </button>
+  <button
+    onClick={toggleSound}
+    aria-label={soundOn ? "Mute video" : "Turn video sound on"}
+    className="absolute bottom-8 right-6 z-20 flex items-center gap-3 border border-white/30 px-4 py-1 text-[9px] uppercase tracking-[0.18em] text-white/80 backdrop-blur-sm transition hover:border-white hover:text-white sm:right-10 lg:right-16"
+  >
+    <span
+      className={`h-1.5 w-1.5 rounded-full ${
+        soundOn ? "bg-white" : "border border-white/70"
+      }`}
+    />
 
-        <div className="absolute bottom-9 left-6 z-20 hidden items-center gap-4 sm:flex lg:left-16">
-          <span className="h-12 w-px bg-white/40" />
+    {soundOn ? "Sound On" : "Sound Off"}
+  </button>
 
-          <span className="text-[9px] uppercase tracking-[0.25em] text-white/60">
-            Scroll to explore
-          </span>
-        </div>
-      </section>
+  <div className="absolute bottom-9 left-6 z-20 hidden items-center gap-4 sm:flex lg:left-16">
+    <span className="h-12 w-px bg-white/40" />
+
+    <span className="text-[9px] uppercase tracking-[0.25em] text-white/60">
+      Scroll to explore
+    </span>
+  </div>
+</section>
 
       {/* ABOUT */}
 
