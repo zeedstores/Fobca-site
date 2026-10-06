@@ -1,0 +1,10 @@
+{
+  "description": "Showcases premium, stylish furniture sourced internationally for Nigerian homes and businesses with a clean, elegant shopping experience.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
