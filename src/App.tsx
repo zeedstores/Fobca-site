@@ -1294,13 +1294,7 @@ function HomePage() {
             {/* COMPANY DESCRIPTION */}
             <div className="max-w-md">
 
-              <p className="text-[13px] leading-5 text-[#101b18]/55 sm:text-xs sm:leading-6">
-                Fobca Limited is a premium furniture company offering carefully
-                selected imported furniture from China, Dubai, Egypt and
-                Turkiye designed to bring comfort, elegance and functionality
-                into modern spaces.
-              </p>
-
+             
               {/* COMPACT BRAND SIGNATURE */}
               <div className="mt-6 border-t border-[#101b18]/15 pt-4">
                 <p className="font-serif text-2xl leading-none text-[#101b18]">
