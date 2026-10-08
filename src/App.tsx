@@ -1188,9 +1188,7 @@ function HomePage() {
   <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-[1500px] items-end px-6 pb-24 sm:px-10 sm:pb-28 lg:px-16 lg:pb-32">
     <div className="max-w-4xl">
 
-      <p className="mb-6 text-[10px] uppercase tracking-[0.35em] text-white/70 sm:text-xs">
-        FOBCA LIMITED
-      </p>
+
 
       <h1 className="max-w-4xl font-serif text-5xl leading-[0.95] tracking-[-0.04em] text-white sm:text-6xl md:text-7xl lg:text-[100px]">
         We realize
