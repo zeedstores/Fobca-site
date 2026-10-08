@@ -3,7 +3,8 @@ import heroVideo from "./imports/VID-20261005-WA0000.mp4";
 import fobcaBanner from "./imports/fobca-banner.png";
 import fobcaImage from "./imports/Fobca-image.png";
 import { supabase } from "./lib/supabase";
-
+import homeBanner from "./imports/home-banner.png";
+import homeBannerMobile from "./imports/home-banner-mobile.png";
 
 type Department = {
   name: string;
@@ -73,7 +74,7 @@ async function getStoreSettings(): Promise<StoreSettings | null> {
 
 const departments: Department[] = [
   {
-    name: "Furniture",
+    name: "Furnitures",
     eyebrow: "Available now",
     path: "/furniture",
     available: true,
@@ -85,19 +86,19 @@ const departments: Department[] = [
     available: false,
   },
   {
-    name: "Building & Interior Decorations",
+    name: "Building & Interiors ",
     eyebrow: "Coming soon",
     path: "/building-interior",
     available: false,
   },
   {
-    name: "Construction",
+    name: "Constructions",
     eyebrow: "Coming soon",
     path: "/construction",
     available: false,
   },
   {
-    name: "Architectural Design",
+    name: "Architectural Designs",
     eyebrow: "Coming soon",
     path: "/architecture",
     available: false,
@@ -1158,87 +1159,71 @@ function HomePage() {
         )}
       </header>
 
-      {/* =====================================================
-          HERO
-      ===================================================== */}
+     {/* HERO */}
+<section
+  id="qdcwfs"
+  className="relative min-h-[100svh] overflow-hidden bg-[#101b18]"
+>
+  {/* HERO BANNER */}
+ <picture className="absolute inset-0">
+  <source
+    media="(max-width: 639px)"
+    srcSet={homeBannerMobile}
+  />
 
-      <section className="relative h-[100svh] min-h-[680px] overflow-hidden bg-[#101b18]">
+  <img
+    src={homeBanner}
+    alt="FOBCA Limited"
+    className="h-full w-full object-cover object-center"
+  />
+</picture>
 
-        <video
-          className="absolute inset-0 h-full w-full object-cover object-[center_70%] sm:object-[center_25%] lg:object-[center_20%]"
-          src={heroVideo}
-          autoPlay
-          muted={!soundOn}
-          loop
-          playsInline
-          preload="auto"
-        />
+  {/* DARK OVERLAY */}
+  <div className="absolute inset-0 bg-black/30" />
 
-        <div className="absolute inset-0 bg-black/30" />
+  {/* BOTTOM DARKENING */}
+  <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/65 via-black/20 to-transparent" />
 
-        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/65 via-black/20 to-transparent" />
+  {/* HERO CONTENT */}
+  <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-[1500px] items-end px-6 pb-24 sm:px-10 sm:pb-28 lg:px-16 lg:pb-32">
+    <div className="max-w-4xl">
 
-        <div className="relative z-10 mx-auto flex h-full max-w-[1500px] items-end px-6 pb-24 sm:px-10 sm:pb-28 lg:px-16 lg:pb-32">
-          <div className="max-w-4xl">
+      <p className="mb-6 text-[10px] uppercase tracking-[0.35em] text-white/70 sm:text-xs">
+        FOBCA LIMITED
+      </p>
 
-            <p className="mb-6 text-[10px] uppercase tracking-[0.35em] text-white/70 sm:text-xs">
-              FOBCA LIMITED
-            </p>
+      <h1 className="max-w-4xl font-serif text-5xl leading-[0.95] tracking-[-0.04em] text-white sm:text-6xl md:text-7xl lg:text-[100px]">
+        We realize
+        <br />
+        <span className="font-light italic">
+          your dreams.
+        </span>
+      </h1>
 
-            <h1 className="max-w-4xl font-serif text-5xl leading-[0.95] tracking-[-0.04em] text-white sm:text-6xl md:text-7xl lg:text-[100px]">
-              We realize
-              <br />
-              <span className="font-light italic">
-                your dreams.
-              </span>
-            </h1>
+      <div className="mt-8 flex max-w-xl items-start gap-5">
+        <span className="mt-2 h-px w-12 shrink-0 bg-white/60" />
+      </div>
 
-            <div className="mt-8 flex max-w-xl items-start gap-5">
-              <span className="mt-2 h-px w-12 shrink-0 bg-white/60" />
-            </div>
+      <button
+        onClick={() => navigate("/furniture")}
+        className="mt-8 inline-flex items-center gap-5 bg-white/80 px-6 py-4 text-[10px] uppercase tracking-[0.2em] text-[#101b18] transition duration-300 hover:bg-white"
+      >
+        Explore Furniture
+        <span className="text-base leading-none">
+          →
+        </span>
+      </button>
+    </div>
+  </div>
 
-            <button
-              onClick={() => navigate("/furniture")}
-              className="mt-8 inline-flex items-center gap-5 bg-white/80 px-6 py-4 text-[10px] uppercase tracking-[0.2em] text-[#101b18] transition duration-300 hover:bg-white"
-            >
-              Explore Furniture
-              <span className="text-base leading-none">
-                →
-              </span>
-            </button>
-          </div>
-        </div>
-
-        {/* SOUND TOGGLE */}
-        <button
-          onClick={toggleSound}
-          aria-label={
-            soundOn
-              ? "Mute video"
-              : "Turn video sound on"
-          }
-          className="absolute bottom-8 right-6 z-20 flex items-center gap-3 border border-white/30 px-4 py-1 text-[9px] uppercase tracking-[0.18em] text-white/80 backdrop-blur-sm transition hover:border-white hover:text-white sm:right-10 lg:right-16"
-        >
-          <span
-            className={`h-1.5 w-1.5 rounded-full ${
-              soundOn
-                ? "bg-white"
-                : "border border-white/70"
-            }`}
-          />
-
-          {soundOn ? "Sound On" : "Sound Off"}
-        </button>
-
-        {/* SCROLL INDICATOR */}
-        <div className="absolute bottom-9 left-6 z-20 hidden items-center gap-4 sm:flex lg:left-16">
-          <span className="h-12 w-px bg-white/40" />
-
-          <span className="text-[9px] uppercase tracking-[0.25em] text-white/60">
-            Scroll to explore
-          </span>
-        </div>
-      </section>
+  {/* SCROLL INDICATOR */}
+  <div className="absolute bottom-9 left-6 z-20 hidden items-center gap-4 sm:flex lg:left-16">
+    <span className="h-12 w-px bg-white/40" />
+    <span className="text-[9px] uppercase tracking-[0.25em] text-white/60">
+      Scroll to explore
+    </span>
+  </div>
+</section>
 
       {/* =====================================================
           ABOUT
@@ -1246,7 +1231,7 @@ function HomePage() {
 
       <section
         id="about"
-        className="relative overflow-hidden bg-[#f3f0e8] px-6 py-24 sm:px-10 sm:py-32 lg:px-16 lg:py-40"
+        className="relative overflow-hidden bg-[#f3f0e8] px-6 py-18 sm:px-10 sm:py-32 lg:px-16 lg:py-40"
       >
 
         <div className="pointer-events-none absolute right-[-120px] top-[-120px] h-[420px] w-[420px] rounded-full border border-[#174b32]/10" />
@@ -1716,6 +1701,73 @@ function HomePage() {
             </div>
 
           </div>
+        </div>
+      </section>
+
+      {/* =====================================================
+          FOBCA FILM
+      ===================================================== */}
+
+      <section className="bg-[#101b18] px-6 py-24 text-white sm:px-10 sm:py-32 lg:px-16 lg:py-40">
+
+        <div className="mx-auto max-w-[1400px]">
+
+          <div className="mb-10 flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
+
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.3em] text-white/40">
+                The FOBCA experience
+              </p>
+
+              <h2 className="mt-5 max-w-3xl font-serif text-4xl leading-[0.95] tracking-[-0.04em] sm:text-5xl lg:text-7xl">
+                A closer look at
+                <span className="font-light italic text-[#d8961c]">
+                  {" "}FOBCA.
+                </span>
+              </h2>
+            </div>
+
+            <p className="max-w-sm text-sm leading-7 text-white/45">
+              Discover the spaces, details and moments behind the brand.
+            </p>
+
+          </div>
+
+          <div className="relative overflow-hidden bg-black">
+
+            <video
+              className="block aspect-video w-full object-cover"
+              src={heroVideo}
+              autoPlay
+              muted={!soundOn}
+              loop
+              playsInline
+              preload="auto"
+              controls
+            />
+
+            <button
+              onClick={toggleSound}
+              aria-label={
+                soundOn
+                  ? "Mute video"
+                  : "Turn video sound on"
+              }
+              className="absolute bottom-5 right-5 z-20 flex items-center gap-3 border border-white/30 bg-black/20 px-4 py-2 text-[9px] uppercase tracking-[0.18em] text-white/80 backdrop-blur-sm transition hover:border-white hover:text-white sm:bottom-6 sm:right-6"
+            >
+              <span
+                className={`h-1.5 w-1.5 rounded-full ${
+                  soundOn
+                    ? "bg-white"
+                    : "border border-white/70"
+                }`}
+              />
+
+              {soundOn ? "Sound On" : "Sound Off"}
+            </button>
+
+          </div>
+
         </div>
       </section>
 
