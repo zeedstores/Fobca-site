@@ -828,388 +828,759 @@ function Footer() {
 ========================================================= */
 
 function HomePage() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [soundOn, setSoundOn] = useState(false);
-  const [headerDark, setHeaderDark] = useState(false);
-  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
-  const [storeSettings, setStoreSettings] =
-    useState<StoreSettings | null>(null);
 
-  // =====================================================
-  // CUSTOMER MESSAGE FORM
-  // =====================================================
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  const [messageForm, setMessageForm] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    message: "",
-  });
+  const [soundOn, setSoundOn] = useState(false);
 
-  const [messageSending, setMessageSending] = useState(false);
-  const [messageSent, setMessageSent] = useState(false);
-  const [messageError, setMessageError] = useState("");
+  const [headerDark, setHeaderDark] = useState(false);
 
-  const toggleSound = () => {
-    setSoundOn((current) => !current);
-  };
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
 
-  // =====================================================
-  // HEADER SCROLL
-  // =====================================================
+  const [storeSettings, setStoreSettings] =
 
+    useState<StoreSettings | null>(null);
+
+
+
+  // =====================================================
+
+  // CUSTOMER MESSAGE FORM
+
+  // =====================================================
+
+
+
+  const [messageForm, setMessageForm] = useState({
+
+    name: "",
+
+    email: "",
+
+    phone: "",
+
+    message: "",
+
+  });
+
+
+
+  const [messageSending, setMessageSending] = useState(false);
+
+  const [messageSent, setMessageSent] = useState(false);
+
+  const [messageError, setMessageError] = useState("");
+
+
+
+  const toggleSound = () => {
+
+    setSoundOn((current) => !current);
+
+  };
+
+
+
+  // =====================================================
+
+  // LIGHTWEIGHT SCROLL REVEALS
   useEffect(() => {
-    const handleScroll = () => {
-      const heroHeight = window.innerHeight;
-      setHeaderDark(window.scrollY > heroHeight - 100);
-    };
+    const elements = document.querySelectorAll<HTMLElement>(".fobca-reveal");
 
-    handleScroll();
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  // =====================================================
-  // LOAD FEATURED PRODUCTS
-  // =====================================================
-
-  useEffect(() => {
-    const loadFeaturedProducts = async () => {
-      const { data, error } = await supabase
-        .from("products")
-        .select("*")
-        .eq("is_active", true)
-        .order("created_at", { ascending: false })
-        .limit(4);
-
-      if (error) {
-        console.error("Error loading homepage products:", error);
-        return;
-      }
-
-      setFeaturedProducts((data ?? []) as Product[]);
-    };
-
-    loadFeaturedProducts();
-  }, []);
-
-  // =====================================================
-  // LOAD STORE SETTINGS
-  // =====================================================
-
-  useEffect(() => {
-    const loadStoreSettings = async () => {
-      const { data, error } = await supabase
-        .from("store_settings")
-        .select("*")
-        .limit(1)
-        .maybeSingle();
-
-      if (error) {
-        console.error("Error loading store settings:", error);
-        return;
-      }
-
-      console.log("Homepage store settings:", data);
-
-      setStoreSettings(data as StoreSettings | null);
-    };
-
-    loadStoreSettings();
-  }, []);
-
-  // =====================================================
-  // CUSTOMER MESSAGE SUBMIT
-  // =====================================================
-
-  const handleMessageSubmit = async (
-    event: React.FormEvent<HTMLFormElement>,
-  ) => {
-    event.preventDefault();
-
-    setMessageSending(true);
-    setMessageSent(false);
-    setMessageError("");
-
-    const { error } = await supabase.from("customer_messages").insert({
-      name: messageForm.name.trim(),
-      email: messageForm.email.trim(),
-      phone: messageForm.phone.trim() || null,
-      message: messageForm.message.trim(),
-    });
-
-    if (error) {
-      console.error("Error sending customer message:", error);
-
-      setMessageError(
-        "We couldn't send your message right now. Please try again.",
-      );
-
-      setMessageSending(false);
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      elements.forEach((element) => element.classList.add("is-visible"));
       return;
     }
 
-    setMessageForm({
-      name: "",
-      email: "",
-      phone: "",
-      message: "",
-    });
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.08, rootMargin: "0px 0px -35px 0px" },
+    );
 
-    setMessageSent(true);
-    setMessageSending(false);
-  };
+    elements.forEach((element) => observer.observe(element));
+    return () => observer.disconnect();
+  }, []);
 
-  return (
-    <div className="min-h-screen bg-[#f3f0e8] text-[#101b18]">
+  // HEADER SCROLL
 
-      {/* =====================================================
-          HEADER
-      ===================================================== */}
+  // =====================================================
 
-      <header className="fixed left-0 right-0 top-0 z-50">
-        <div className="mx-auto flex h-24 max-w-[1500px] items-center justify-between px-6 sm:px-10 lg:px-16">
 
-          <button
-            onClick={() => {
-              setMenuOpen(false);
-              navigate("/");
-            }}
-            className="group flex items-center"
-          >
-            <img
-              src="/assets/fobca-logo-source.png"
-              alt="FOBCA Limited"
-              className={`h-12 w-auto object-contain transition duration-500 ${
-                headerDark ? "" : "brightness-0 invert"
-              }`}
-            />
-          </button>
 
-          {/* DESKTOP NAV */}
-          <nav className="hidden items-center gap-10 md:flex">
+  useEffect(() => {
 
-            {/* HOME */}
-            <button
-              onClick={() => navigate("/")}
-              className={`text-[11px] uppercase tracking-[0.2em] transition duration-500 ${
-                headerDark
-                  ? "text-[#101b18]"
-                  : "text-white"
-              }`}
-            >
-              Home
-            </button>
+    const handleScroll = () => {
 
-            {/* ABOUT US */}
-            <button
-              onClick={() => {
-                document
-                  .querySelector("#about")
-                  ?.scrollIntoView({ behavior: "smooth" });
-              }}
-              className={`text-[11px] uppercase tracking-[0.2em] transition duration-500 ${
-                headerDark
-                  ? "text-[#101b18]/65 hover:text-[#101b18]"
-                  : "text-white/80 hover:text-white"
-              }`}
-            >
-              About Us
-            </button>
+      const heroHeight = window.innerHeight;
 
-            {/* FURNITURE */}
-            <button
-              onClick={() => navigate("/furniture")}
-              className={`text-[11px] uppercase tracking-[0.2em] transition duration-500 ${
-                headerDark
-                  ? "text-[#101b18]/65 hover:text-[#101b18]"
-                  : "text-white/80 hover:text-white"
-              }`}
-            >
-              Furniture
-            </button>
+      setHeaderDark(window.scrollY > heroHeight - 100);
 
-            {/* DEPARTMENTS */}
-            <button
-              onClick={() => {
-                document
-                  .querySelector("#departments")
-                  ?.scrollIntoView({ behavior: "smooth" });
-              }}
-              className={`text-[11px] uppercase tracking-[0.2em] transition duration-500 ${
-                headerDark
-                  ? "text-[#101b18]/65 hover:text-[#101b18]"
-                  : "text-white/80 hover:text-white"
-              }`}
-            >
-              Departments
-            </button>
+    };
 
-            {/* CONTACT US */}
-            <button
-              onClick={() => {
-                document
-                  .querySelector("#contact")
-                  ?.scrollIntoView({ behavior: "smooth" });
-              }}
-              className={`text-[11px] uppercase tracking-[0.2em] transition duration-500 ${
-                headerDark
-                  ? "text-[#101b18]/65 hover:text-[#101b18]"
-                  : "text-white/80 hover:text-white"
-              }`}
-            >
-              Contact Us
-            </button>
-          </nav>
 
-          {/* MOBILE MENU BUTTON */}
-          <button
-            onClick={() => setMenuOpen((current) => !current)}
-            className="flex h-10 w-10 flex-col items-end justify-center gap-2 md:hidden"
-            aria-label={menuOpen ? "Close navigation" : "Open navigation"}
-            aria-expanded={menuOpen}
-          >
-            <span
-              className={`h-px w-7 transition-all duration-500 ${
-                headerDark ? "bg-[#101b18]" : "bg-white"
-              } ${
-                menuOpen
-                  ? "translate-y-[4.5px] -rotate-45"
-                  : ""
-              }`}
-            />
 
-            <span
-              className={`h-px w-5 transition-all duration-500 ${
-                headerDark ? "bg-[#101b18]" : "bg-white"
-              } ${
-                menuOpen
-                  ? "-translate-y-[4.5px] -rotate-45"
-                  : ""
-              }`}
-            />
-          </button>
-        </div>
+    handleScroll();
 
-        {/* MOBILE NAV */}
-        {menuOpen && (
-          <div className="border-t border-black/10 bg-[#101b18]/95 px-6 pb-8 pt-3 backdrop-blur-md md:hidden">
-            <nav className="flex flex-col">
 
-              <button
-                onClick={() => {
-                  setMenuOpen(false);
-                  navigate("/");
-                }}
-                className="border-b border-white/10 py-5 text-left text-xs uppercase tracking-[0.2em] text-white"
-              >
-                Home
-              </button>
 
-              <button
-                onClick={() => {
-                  setMenuOpen(false);
-                  document
-                    .querySelector("#about")
-                    ?.scrollIntoView({ behavior: "smooth" });
-                }}
-                className="border-b border-white/10 py-5 text-left text-xs uppercase tracking-[0.2em] text-white/70"
-              >
-                About Us
-              </button>
+    window.addEventListener("scroll", handleScroll, { passive: true });
 
-              <button
-                onClick={() => {
-                  setMenuOpen(false);
-                  navigate("/furniture");
-                }}
-                className="border-b border-white/10 py-5 text-left text-xs uppercase tracking-[0.2em] text-white/70"
-              >
-                Furniture
-              </button>
 
-              <button
-                onClick={() => {
-                  setMenuOpen(false);
-                  document
-                    .querySelector("#departments")
-                    ?.scrollIntoView({ behavior: "smooth" });
-                }}
-                className="border-b border-white/10 py-5 text-left text-xs uppercase tracking-[0.2em] text-white/70"
-              >
-                Departments
-              </button>
 
-              <button
-                onClick={() => {
-                  setMenuOpen(false);
-                  document
-                    .querySelector("#contact")
-                    ?.scrollIntoView({ behavior: "smooth" });
-                }}
-                className="py-5 text-left text-xs uppercase tracking-[0.2em] text-white/70"
-              >
-                Contact Us
-              </button>
+    return () => window.removeEventListener("scroll", handleScroll);
 
-            </nav>
-          </div>
-        )}
-      </header>
+  }, []);
 
-     {/* HERO */}
+
+
+  // =====================================================
+
+  // LOAD FEATURED PRODUCTS
+
+  // =====================================================
+
+
+
+  useEffect(() => {
+
+    const loadFeaturedProducts = async () => {
+
+      const { data, error } = await supabase
+
+        .from("products")
+
+        .select("*")
+
+        .eq("is_active", true)
+
+        .order("created_at", { ascending: false })
+
+        .limit(4);
+
+
+
+      if (error) {
+
+        console.error("Error loading homepage products:", error);
+
+        return;
+
+      }
+
+
+
+      setFeaturedProducts((data ?? []) as Product[]);
+
+    };
+
+
+
+    loadFeaturedProducts();
+
+  }, []);
+
+
+
+  // =====================================================
+
+  // LOAD STORE SETTINGS
+
+  // =====================================================
+
+
+
+  useEffect(() => {
+
+    const loadStoreSettings = async () => {
+
+      const { data, error } = await supabase
+
+        .from("store_settings")
+
+        .select("*")
+
+        .limit(1)
+
+        .maybeSingle();
+
+
+
+      if (error) {
+
+        console.error("Error loading store settings:", error);
+
+        return;
+
+      }
+
+
+
+      console.log("Homepage store settings:", data);
+
+
+
+      setStoreSettings(data as StoreSettings | null);
+
+    };
+
+
+
+    loadStoreSettings();
+
+  }, []);
+
+
+
+  // =====================================================
+
+  // CUSTOMER MESSAGE SUBMIT
+
+  // =====================================================
+
+
+
+  const handleMessageSubmit = async (
+
+    event: React.FormEvent<HTMLFormElement>,
+
+  ) => {
+
+    event.preventDefault();
+
+
+
+    setMessageSending(true);
+
+    setMessageSent(false);
+
+    setMessageError("");
+
+
+
+    const { error } = await supabase.from("customer_messages").insert({
+
+      name: messageForm.name.trim(),
+
+      email: messageForm.email.trim(),
+
+      phone: messageForm.phone.trim() || null,
+
+      message: messageForm.message.trim(),
+
+    });
+
+
+
+    if (error) {
+
+      console.error("Error sending customer message:", error);
+
+
+
+      setMessageError(
+
+        "We couldn't send your message right now. Please try again.",
+
+      );
+
+
+
+      setMessageSending(false);
+
+      return;
+
+    }
+
+
+
+    setMessageForm({
+
+      name: "",
+
+      email: "",
+
+      phone: "",
+
+      message: "",
+
+    });
+
+
+
+    setMessageSent(true);
+
+    setMessageSending(false);
+
+  };
+
+
+
+  return (
+
+    <div className="min-h-screen bg-[#f3f0e8] text-[#101b18]">
+      <style>{`
+        .fobca-reveal {
+          opacity: 0;
+          transform: translateY(22px);
+          transition: opacity 700ms ease, transform 700ms cubic-bezier(0.2, 0.65, 0.3, 1);
+        }
+        .fobca-reveal.is-visible {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .fobca-reveal, .fobca-reveal.is-visible {
+            opacity: 1;
+            transform: none;
+            transition: none;
+          }
+        }
+      `}</style>
+
+
+
+      {/* =====================================================
+
+          HEADER
+
+      ===================================================== */}
+
+
+
+      <header className="fixed left-0 right-0 top-0 z-50">
+
+        <div className="mx-auto flex h-24 max-w-[1500px] items-center justify-between px-6 sm:px-10 lg:px-16">
+
+
+
+          <button
+
+            onClick={() => {
+
+              setMenuOpen(false);
+
+              navigate("/");
+
+            }}
+
+            className="group flex items-center"
+
+          >
+
+            <img
+
+              src="/assets/fobca-logo-source.png"
+
+              alt="FOBCA Limited"
+
+              className={`h-12 w-auto object-contain transition duration-500 ${
+
+                headerDark ? "" : "brightness-0 invert"
+
+              }`}
+
+            />
+
+          </button>
+
+
+
+          {/* DESKTOP NAV */}
+
+          <nav className="hidden items-center gap-10 md:flex">
+
+
+
+            {/* HOME */}
+
+            <button
+
+              onClick={() => navigate("/")}
+
+              className={`text-[11px] uppercase tracking-[0.2em] transition duration-500 ${
+
+                headerDark
+
+                  ? "text-[#101b18]"
+
+                  : "text-white"
+
+              }`}
+
+            >
+
+              Home
+
+            </button>
+
+
+
+            {/* ABOUT US */}
+
+            <button
+
+              onClick={() => {
+
+                document
+
+                  .querySelector("#about")
+
+                  ?.scrollIntoView({ behavior: "smooth" });
+
+              }}
+
+              className={`text-[11px] uppercase tracking-[0.2em] transition duration-500 ${
+
+                headerDark
+
+                  ? "text-[#101b18]/65 hover:text-[#101b18]"
+
+                  : "text-white/80 hover:text-white"
+
+              }`}
+
+            >
+
+              About Us
+
+            </button>
+
+
+
+            {/* FURNITURE */}
+
+            <button
+
+              onClick={() => navigate("/furniture")}
+
+              className={`text-[11px] uppercase tracking-[0.2em] transition duration-500 ${
+
+                headerDark
+
+                  ? "text-[#101b18]/65 hover:text-[#101b18]"
+
+                  : "text-white/80 hover:text-white"
+
+              }`}
+
+            >
+
+              Furniture
+
+            </button>
+
+
+
+            {/* DEPARTMENTS */}
+
+            <button
+
+              onClick={() => {
+
+                document
+
+                  .querySelector("#departments")
+
+                  ?.scrollIntoView({ behavior: "smooth" });
+
+              }}
+
+              className={`text-[11px] uppercase tracking-[0.2em] transition duration-500 ${
+
+                headerDark
+
+                  ? "text-[#101b18]/65 hover:text-[#101b18]"
+
+                  : "text-white/80 hover:text-white"
+
+              }`}
+
+            >
+
+              Departments
+
+            </button>
+
+
+
+            {/* CONTACT US */}
+
+            <button
+
+              onClick={() => {
+
+                document
+
+                  .querySelector("#contact")
+
+                  ?.scrollIntoView({ behavior: "smooth" });
+
+              }}
+
+              className={`text-[11px] uppercase tracking-[0.2em] transition duration-500 ${
+
+                headerDark
+
+                  ? "text-[#101b18]/65 hover:text-[#101b18]"
+
+                  : "text-white/80 hover:text-white"
+
+              }`}
+
+            >
+
+              Contact Us
+
+            </button>
+
+          </nav>
+
+
+
+          {/* MOBILE MENU BUTTON */}
+
+          <button
+
+            onClick={() => setMenuOpen((current) => !current)}
+
+            className="flex h-10 w-10 flex-col items-end justify-center gap-2 md:hidden"
+
+            aria-label={menuOpen ? "Close navigation" : "Open navigation"}
+
+            aria-expanded={menuOpen}
+
+          >
+
+            <span
+
+              className={`h-px w-7 transition-all duration-500 ${
+
+                headerDark ? "bg-[#101b18]" : "bg-white"
+
+              } ${
+
+                menuOpen
+
+                  ? "translate-y-[4.5px] -rotate-45"
+
+                  : ""
+
+              }`}
+
+            />
+
+
+
+            <span
+
+              className={`h-px w-5 transition-all duration-500 ${
+
+                headerDark ? "bg-[#101b18]" : "bg-white"
+
+              } ${
+
+                menuOpen
+
+                  ? "-translate-y-[4.5px] -rotate-45"
+
+                  : ""
+
+              }`}
+
+            />
+
+          </button>
+
+        </div>
+
+
+
+        {/* MOBILE NAV */}
+
+        {menuOpen && (
+
+          <div className="border-t border-black/10 bg-[#101b18]/95 px-6 pb-8 pt-3 backdrop-blur-md md:hidden">
+
+            <nav className="flex flex-col">
+
+
+
+              <button
+
+                onClick={() => {
+
+                  setMenuOpen(false);
+
+                  navigate("/");
+
+                }}
+
+                className="border-b border-white/10 py-5 text-left text-xs uppercase tracking-[0.2em] text-white"
+
+              >
+
+                Home
+
+              </button>
+
+
+
+              <button
+
+                onClick={() => {
+
+                  setMenuOpen(false);
+
+                  document
+
+                    .querySelector("#about")
+
+                    ?.scrollIntoView({ behavior: "smooth" });
+
+                }}
+
+                className="border-b border-white/10 py-5 text-left text-xs uppercase tracking-[0.2em] text-white/70"
+
+              >
+
+                About Us
+
+              </button>
+
+
+
+              <button
+
+                onClick={() => {
+
+                  setMenuOpen(false);
+
+                  navigate("/furniture");
+
+                }}
+
+                className="border-b border-white/10 py-5 text-left text-xs uppercase tracking-[0.2em] text-white/70"
+
+              >
+
+                Furniture
+
+              </button>
+
+
+
+              <button
+
+                onClick={() => {
+
+                  setMenuOpen(false);
+
+                  document
+
+                    .querySelector("#departments")
+
+                    ?.scrollIntoView({ behavior: "smooth" });
+
+                }}
+
+                className="border-b border-white/10 py-5 text-left text-xs uppercase tracking-[0.2em] text-white/70"
+
+              >
+
+                Departments
+
+              </button>
+
+
+
+              <button
+
+                onClick={() => {
+
+                  setMenuOpen(false);
+
+                  document
+
+                    .querySelector("#contact")
+
+                    ?.scrollIntoView({ behavior: "smooth" });
+
+                }}
+
+                className="py-5 text-left text-xs uppercase tracking-[0.2em] text-white/70"
+
+              >
+
+                Contact Us
+
+              </button>
+
+
+
+            </nav>
+
+          </div>
+
+        )}
+
+      </header>
+
+
+
+    
+{/* HERO */}
 <section
   id="qdcwfs"
-  className="relative min-h-[100svh] overflow-hidden bg-[#101b18]"
+  className="relative isolate flex min-h-[100svh] flex-col justify-end overflow-hidden bg-[#101b18] sm:min-h-[100svh]"
 >
-  {/* HERO BANNER */}
- <picture className="absolute inset-0">
-  <source
-    media="(max-width: 639px)"
-    srcSet={homeBannerMobile}
-  />
+  {/* FULL HERO BANNER */}
+  <picture className="absolute inset-0 -z-20 block">
+    <source
+      media="(max-width: 639px)"
+      srcSet={homeBannerMobile}
+    />
+    <img
+      src={homeBanner}
+      alt="FOBCA Limited furniture collection"
+      className="h-full w-full object-cover object-center"
+      loading="eager"
+      fetchPriority="high"
+      decoding="async"
+    />
+  </picture>
 
-  <img
-    src={homeBanner}
-    alt="FOBCA Limited"
-    className="h-full w-full object-cover object-center"
-  />
-</picture>
-
-  {/* DARK OVERLAY */}
-  <div className="absolute inset-0 bg-black/30" />
-
-  {/* BOTTOM DARKENING */}
-  <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/65 via-black/20 to-transparent" />
+  {/* OVERLAY FOR TEXT LEGIBILITY */}
+  <div className="absolute inset-0 -z-10 bg-black/20" />
+  <div className="absolute inset-x-0 bottom-0 -z-10 h-[65%] bg-gradient-to-t from-black/65 via-black/20 to-transparent" />
 
   {/* HERO CONTENT */}
-  <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-[1500px] items-end px-6 pb-24 sm:px-10 sm:pb-28 lg:px-16 lg:pb-32">
-    <div className="max-w-4xl">
+  <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-[1500px] items-end px-6 pb-18 pt-36 sm:px-10 sm:pb-20 lg:px-16 lg:pb-24">
+    <div className="fobca-reveal max-w-4xl">
+      <h1 className="max-w-4xl font-serif italic text-5xl leading-[0.95] tracking-[-0.04em] text-white sm:text-6xl md:text-7xl lg:text-[100px]">
+  We realize
+  <br />
+  <span className="font-light">
+    your dreams.
+  </span>
+</h1>
 
-
-
-      <h1 className="max-w-4xl font-serif text-5xl leading-[0.95] tracking-[-0.04em] text-white sm:text-6xl md:text-7xl lg:text-[100px]">
-        We realize
-        <br />
-        <span className="font-light italic">
-          your dreams.
-        </span>
-      </h1>
-
-      <div className="mt-8 flex max-w-xl items-start gap-5">
-        <span className="mt-2 h-px w-12 shrink-0 bg-white/60" />
-      </div>
+      <p className="mt-5 max-w-sm text-xs leading-6 tracking-[0.06em] text-white/95 sm:mt-6 sm:text-sm sm:leading-7">
+        Electrifying imported furniture for modern living
+      </p>
 
       <button
         onClick={() => navigate("/furniture")}
-        className="mt-8 inline-flex items-center gap-5 bg-white/80 px-6 py-4 text-[10px] uppercase tracking-[0.2em] text-[#101b18] transition duration-300 hover:bg-white"
+        className="mt-7 inline-flex items-center gap-5 bg-white/90 px-5 py-4 text-[10px] uppercase tracking-[0.18em] text-[#101b18] transition duration-300 hover:bg-white sm:mt-8 sm:px-6"
       >
         Explore Furniture
-        <span className="text-base leading-none">
-          →
-        </span>
+        <span className="text-base leading-none">→</span>
       </button>
     </div>
   </div>
@@ -1223,1209 +1594,2412 @@ function HomePage() {
   </div>
 </section>
 
-      {/* =====================================================
-          ABOUT
-      ===================================================== */}
-
-      <section
-        id="about"
-        className="relative overflow-hidden bg-[#f3f0e8] px-6 py-18 sm:px-10 sm:py-32 lg:px-16 lg:py-40"
-      >
-
-        <div className="pointer-events-none absolute right-[-120px] top-[-120px] h-[420px] w-[420px] rounded-full border border-[#174b32]/10" />
-
-        <div className="pointer-events-none absolute right-[-70px] top-[-70px] h-[320px] w-[320px] rounded-full border border-[#174b32]/10" />
-
-        <div className="relative mx-auto max-w-[1400px]">
-
-          <div className="flex items-center justify-between border-b border-[#101b18]/15 pb-5">
-            <div className="flex items-center gap-4">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#174b32]" />
-
-              <span className="text-[9px] uppercase tracking-[0.3em] text-[#101b18]/55">
-                About Fobca
-              </span>
-            </div>
-
-            <span className="font-mono text-[9px] tracking-[0.2em] text-[#101b18]/35">
-              01 / 05
-            </span>
-          </div>
-
-          {/* ABOUT STATEMENT */}
-          <div className="mt-4 lg:mt-16">
-            <p className="max-w-4xl font-serif text-xl leading-[1.2] tracking-[-0.02em] text-[#101b18] sm:text-3xl md:text-4xl lg:text-6xl">
-              Fobca Limited is a premium furniture company offering
-              <span className="font-light italic text-[#174b32]">
-                {" "}
-                carefully selected imported furniture
-              </span>{" "}
-              from China, Dubai, Egypt and Turkiye designed to bring comfort,
-              elegance and functionality into modern spaces.
-            </p>
-          </div>
-
-          {/* APPROACH + COMPANY DESCRIPTION */}
-          <div className="mt-6 grid gap-16 border-t border-[#101b18]/15 pt-6 lg:grid-cols-[0.7fr_1.3fr] lg:gap-24 lg:pt-16">
-
-            {/* OUR APPROACH */}
-            <div>
-              <p className="text-[9px] uppercase tracking-[0.28em] text-[#101b18]/40">
-                Our Approach
-              </p>
-
-              <div className="mt-8 flex items-start gap-5">
-                <span className="mt-1 font-serif text-5xl leading-none text-[#174b32]/25">
-                  “
-                </span>
-
-                <p className="max-w-xs font-serif text-xl leading-8 text-[#101b18]/75">
-                  We don't just sell furniture.
-                  <br />
-                  We provide carefully selected furniture solutions that bring
-                  comfort, functionality and elegance into your home, office
-                  and commercial spaces.
-                </p>
-              </div>
-            </div>
-
-            {/* COMPANY DESCRIPTION */}
-            <div className="max-w-md">
-
-             
-              {/* COMPACT BRAND SIGNATURE */}
-              <div className="mt-6 border-t border-[#101b18]/15 pt-4">
-                <p className="font-serif text-2xl leading-none text-[#101b18]">
-                  Fobca Limited
-                </p>
-
-                <p className="mt-2 origin-left -skew-x-10 font-serif text-lg italic leading-none tracking-[-0.025em] text-[#174b32]">
-                  We realize your dreams.
-                </p>
-              </div>
-
-              {/* ORIGIN */}
-              <div className="mt-5">
-                <span className="text-[8px] uppercase tracking-[0.25em] text-[#101b18]/40">
-                  China · Dubai · Egypt · Turkiye
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* HOMEPAGE STORE */}
-          <div className="mt-6 border-t border-[#101b18]/15 pt-14 sm:mt-24 sm:pt-16">
-
-            <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
-              <div>
-                <p className="text-[9px] uppercase tracking-[0.3em] text-[#101b18]/40">
-                  From the collection
-                </p>
-
-                <h3 className="mt-4 max-w-2xl font-serif text-3xl leading-[1.05] tracking-[-0.03em] text-[#101b18] sm:text-4xl lg:text-5xl">
-                  Pieces chosen for
-                  <span className="italic font-light text-[#174b32]">
-                    {" "}
-                    beautiful spaces.
-                  </span>
-                </h3>
-              </div>
-            </div>
-
-            <div className="mt-12 grid grid-cols-2 gap-x-4 gap-y-12 sm:grid-cols-3 lg:grid-cols-4 lg:gap-x-6">
-              {featuredProducts.map((product, index) => (
-                <article
-                  key={product.id}
-                  className="group"
-                >
-
-                  <button
-                    onClick={() => navigate("/furniture")}
-                    className="relative block aspect-[4/5] w-full overflow-hidden bg-[#e2ddd2] text-left"
-                  >
-
-                    {product.image_url ? (
-                      <img
-                        src={product.image_url}
-                        alt={product.name}
-                        className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035]"
-                      />
-                    ) : (
-                      <ImagePlaceholder label={product.name} />
-                    )}
-
-                    <span className="absolute left-4 top-4 font-mono text-[8px] tracking-[0.15em] text-white/75">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-
-                    <span className="absolute bottom-4 right-4 flex h-9 w-9 items-center justify-center border border-white/50 bg-black/10 text-sm text-white opacity-0 backdrop-blur-sm transition-all duration-300 group-hover:opacity-100">
-                      ↗
-                    </span>
-                  </button>
-
-                  <div className="pt-5">
-                    <div className="flex items-start justify-between gap-4">
-
-                      <h4 className="font-serif text-lg leading-[1.1] tracking-[-0.015em] text-[#101b18] sm:text-xl">
-                        {product.name}
-                      </h4>
-
-                      <p className="whitespace-nowrap pt-1 text-[10px] tracking-[0.03em] text-[#101b18]/55">
-                        ₦{Number(product.price).toLocaleString("en-NG")}
-                      </p>
-                    </div>
-
-                    <button
-                      onClick={() => navigate("/furniture")}
-                      className="mt-2 flex w-full items-center justify-between border border-[#101b18]/20 px-4 py-1 text-left transition-all duration-300 hover:border-[#174b32] hover:bg-[#174b32] hover:text-white"
-                    >
-                      <span className="text-[8px] uppercase tracking-[0.2em]">
-                        Order this piece
-                      </span>
-
-                      <span className="text-sm transition-transform duration-300 group-hover:translate-x-1">
-                        →
-                      </span>
-                    </button>
-                  </div>
-                </article>
-              ))}
-            </div>
-
-            <div className="mt-14 flex flex-col gap-4 border-t border-[#101b18]/15 pt-6 sm:flex-row sm:items-center sm:justify-between">
-
-              <p className="max-w-md text-xs leading-6 text-[#101b18]/45">
-                Explore our collection of bedroom sets, sofa sets, dining
-                sets, adjustable coffee tables, rocking chairs with footstools
-                and bedside table lamps — selected to bring comfort, function
-                and style into your space.
-              </p>
-
-              <button
-                onClick={() => navigate("/furniture")}
-                className="group flex w-fit items-center gap-3 text-[9px] uppercase tracking-[0.25em] text-[#174b32]"
-              >
-                Explore all furniture
-
-                <span className="transition-transform duration-300 group-hover:translate-x-1">
-                  →
-                </span>
-              </button>
-
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* =====================================================
-          DEPARTMENTS
-      ===================================================== */}
-
-      <section
-        id="departments"
-        className="bg-[#101b18] px-6 py-24 text-white sm:px-10 sm:py-32 lg:px-16 lg:py-40"
-      >
-
-        <div className="mx-auto max-w-[1400px]">
-
-          <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
-
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.3em] text-white/45">
-                Our departments
-              </p>
-
-              <h2 className="mt-5 max-w-2xl font-serif text-4xl leading-none tracking-[-0.03em] sm:text-5xl lg:text-6xl">
-                More than
-                <span className="font-light italic">
-                  {" "}furniture.
-                </span>
-              </h2>
-            </div>
-
-            <p className="max-w-sm text-sm leading-7 text-white/50">
-              Explore the different sides of FOBCA, from furniture to the
-              businesses we're building next.
-            </p>
-
-          </div>
-
-          <div className="mt-20 divide-y divide-white/10 border-y border-white/10">
-
-            {departments.map((department, index) => (
-              <button
-                key={department.path}
-                onClick={() => navigate(department.path)}
-                className="group flex w-full items-center justify-between py-8 text-left sm:py-10"
-              >
-
-                <div className="flex items-center gap-6 sm:gap-10">
-
-                  <span className="font-mono text-[10px] text-white/25">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-
-                  <span
-                    className={`font-serif text-3xl tracking-[-0.02em] sm:text-4xl lg:text-5xl ${
-                      department.available
-                        ? "text-white transition group-hover:translate-x-2"
-                        : "text-white/35 transition group-hover:text-white/55"
-                    }`}
-                  >
-                    <span className="text-[#d8961c]">
-                      {department.name.charAt(0)}
-                    </span>
-
-                    {department.name.slice(1)}
-                  </span>
-
-                </div>
-
-                <div className="flex items-center gap-5">
-
-                  <span className="hidden text-[9px] uppercase tracking-[0.2em] text-white/35 sm:block">
-                    {department.available
-                      ? "Explore"
-                      : "Coming soon"}
-                  </span>
-
-                  <span className="text-xl text-white/40 transition group-hover:translate-x-2 group-hover:text-white">
-                    →
-                  </span>
-
-                </div>
-
-              </button>
-            ))}
-
-          </div>
-        </div>
-      </section>
-
-      {/* =====================================================
-          OUR BUSINESSES & AREAS OF EXPANSION
-      ===================================================== */}
-
-      <section
-        id="businesses"
-        className="bg-[#f3f0e8] px-6 py-24 sm:px-10 sm:py-32 lg:px-16 lg:py-40"
-      >
-
-        <div className="mx-auto max-w-[1400px]">
-
-          <div className="grid gap-10 border-b border-[#101b18]/15 pb-10 lg:grid-cols-[1fr_1.2fr] lg:items-end">
-
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.3em] text-[#174b32]/65">
-                Our businesses
-              </p>
-
-              <h2 className="mt-5 max-w-3xl font-serif text-4xl leading-[0.95] tracking-[-0.04em] sm:text-5xl lg:text-7xl">
-                Our Businesses
-                <span className="font-light italic text-[#174b32]">
-                  {" "} &amp; Areas of Expansion
-                </span>
-              </h2>
-            </div>
-
-            <p className="max-w-xl text-sm leading-7 text-[#101b18]/55 lg:ml-auto">
-              Fobca Limited is building a diversified business group with
-              interests in furniture, transportation, real estate, building
-              and interior decoration, construction, architectural design,
-              and the Oil &amp; Gas sector.
-            </p>
-
-          </div>
-
-          <div className="mt-16 divide-y divide-[#101b18]/10 border-y border-[#101b18]/10">
-
-            {/* FURNITURE */}
-            <div className="grid gap-4 py-7 sm:grid-cols-[80px_1fr_auto] sm:items-center sm:gap-8">
-              <span className="font-mono text-[10px] text-[#101b18]/30">
-                01
-              </span>
-
-              <div>
-                <h3 className="font-serif text-2xl tracking-[-0.02em] sm:text-3xl">
-                  Fobca Furniture
-                </h3>
-
-                <p className="mt-2 max-w-2xl text-xs leading-6 text-[#101b18]/50 sm:text-sm">
-                  Premium imported furniture and furnishing solutions.
-                </p>
-              </div>
-
-              <button
-                onClick={() => navigate("/furniture")}
-                className="flex w-fit items-center gap-3 text-[9px] uppercase tracking-[0.2em] text-[#174b32]"
-              >
-                Explore
-                <span>→</span>
-              </button>
-            </div>
-
-            {/* FOBCA LINE */}
-            <div className="grid gap-4 py-7 sm:grid-cols-[80px_1fr_auto] sm:items-center sm:gap-8">
-              <span className="font-mono text-[10px] text-[#101b18]/30">
-                02
-              </span>
-
-              <div>
-                <h3 className="font-serif text-2xl tracking-[-0.02em] sm:text-3xl">
-                  Fobca Line
-                </h3>
-
-                <p className="mt-2 max-w-2xl text-xs leading-6 text-[#101b18]/50 sm:text-sm">
-                  Transportation and mobility solutions.
-                </p>
-              </div>
-
-              <span className="text-[9px] uppercase tracking-[0.2em] text-[#101b18]/30">
-                Coming soon
-              </span>
-            </div>
-
-            {/* FOBCA RESIDENCE */}
-            <div className="grid gap-4 py-7 sm:grid-cols-[80px_1fr_auto] sm:items-center sm:gap-8">
-              <span className="font-mono text-[10px] text-[#101b18]/30">
-                03
-              </span>
-
-              <div>
-                <h3 className="font-serif text-2xl tracking-[-0.02em] sm:text-3xl">
-                  Fobca Residence
-                </h3>
-
-                <p className="mt-2 max-w-2xl text-xs leading-6 text-[#101b18]/50 sm:text-sm">
-                  Residential property and lifestyle solutions.
-                </p>
-              </div>
-
-              <span className="text-[9px] uppercase tracking-[0.2em] text-[#101b18]/30">
-                Coming soon
-              </span>
-            </div>
-
-            {/* BUILDING & INTERIOR */}
-            <div className="grid gap-4 py-7 sm:grid-cols-[80px_1fr_auto] sm:items-center sm:gap-8">
-              <span className="font-mono text-[10px] text-[#101b18]/30">
-                04
-              </span>
-
-              <div>
-                <h3 className="font-serif text-2xl tracking-[-0.02em] sm:text-3xl">
-                  Building &amp; Interior Decorations
-                </h3>
-
-                <p className="mt-2 max-w-2xl text-xs leading-6 text-[#101b18]/50 sm:text-sm">
-                  Building finishing, interior decoration and space
-                  transformation.
-                </p>
-              </div>
-
-              <span className="text-[9px] uppercase tracking-[0.2em] text-[#101b18]/30">
-                Coming soon
-              </span>
-            </div>
-
-            {/* CONSTRUCTION */}
-            <div className="grid gap-4 py-7 sm:grid-cols-[80px_1fr_auto] sm:items-center sm:gap-8">
-              <span className="font-mono text-[10px] text-[#101b18]/30">
-                05
-              </span>
-
-              <div>
-                <h3 className="font-serif text-2xl tracking-[-0.02em] sm:text-3xl">
-                  Construction
-                </h3>
-
-                <p className="mt-2 max-w-2xl text-xs leading-6 text-[#101b18]/50 sm:text-sm">
-                  Construction and property development.
-                </p>
-              </div>
-
-              <span className="text-[9px] uppercase tracking-[0.2em] text-[#101b18]/30">
-                Coming soon
-              </span>
-            </div>
-
-            {/* ARCHITECTURAL DESIGNS */}
-            <div className="grid gap-4 py-7 sm:grid-cols-[80px_1fr_auto] sm:items-center sm:gap-8">
-              <span className="font-mono text-[10px] text-[#101b18]/30">
-                06
-              </span>
-
-              <div>
-                <h3 className="font-serif text-2xl tracking-[-0.02em] sm:text-3xl">
-                  Architectural Designs
-                </h3>
-
-                <p className="mt-2 max-w-2xl text-xs leading-6 text-[#101b18]/50 sm:text-sm">
-                  Architectural planning and creative building designs.
-                </p>
-              </div>
-
-              <span className="text-[9px] uppercase tracking-[0.2em] text-[#101b18]/30">
-                Coming soon
-              </span>
-            </div>
-
-            {/* OIL & GAS */}
-            <div className="grid gap-4 py-7 sm:grid-cols-[80px_1fr_auto] sm:items-center sm:gap-8">
-              <span className="font-mono text-[10px] text-[#101b18]/30">
-                07
-              </span>
-
-              <div>
-                <h3 className="font-serif text-2xl tracking-[-0.02em] sm:text-3xl">
-                  Oil &amp; Gas
-                </h3>
-
-                <p className="mt-2 max-w-2xl text-xs leading-6 text-[#101b18]/50 sm:text-sm">
-                  Future business interests and opportunities within the
-                  Oil &amp; Gas sector.
-                </p>
-              </div>
-
-              <span className="text-[9px] uppercase tracking-[0.2em] text-[#101b18]/30">
-                Coming soon
-              </span>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* =====================================================
-          FOBCA FILM
-      ===================================================== */}
-
-      <section className="bg-[#101b18] px-6 py-24 text-white sm:px-10 sm:py-32 lg:px-16 lg:py-40">
-
-        <div className="mx-auto max-w-[1400px]">
-
-          <div className="mb-10 flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
-
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.3em] text-white/40">
-                The FOBCA experience
-              </p>
-
-              <h2 className="mt-5 max-w-3xl font-serif text-4xl leading-[0.95] tracking-[-0.04em] sm:text-5xl lg:text-7xl">
-                A closer look at
-                <span className="font-light italic text-[#d8961c]">
-                  {" "}FOBCA.
-                </span>
-              </h2>
-            </div>
-
-            <p className="max-w-sm text-sm leading-7 text-white/45">
-              Discover the spaces, details and moments behind the brand.
-            </p>
-
-          </div>
-
-          <div className="relative overflow-hidden bg-black">
-
-            <video
-              className="block aspect-video w-full object-cover"
-              src={heroVideo}
-              autoPlay
-              muted={!soundOn}
-              loop
-              playsInline
-              preload="auto"
-              controls
-            />
-
-            <button
-              onClick={toggleSound}
-              aria-label={
-                soundOn
-                  ? "Mute video"
-                  : "Turn video sound on"
-              }
-              className="absolute bottom-5 right-5 z-20 flex items-center gap-3 border border-white/30 bg-black/20 px-4 py-2 text-[9px] uppercase tracking-[0.18em] text-white/80 backdrop-blur-sm transition hover:border-white hover:text-white sm:bottom-6 sm:right-6"
-            >
-              <span
-                className={`h-1.5 w-1.5 rounded-full ${
-                  soundOn
-                    ? "bg-white"
-                    : "border border-white/70"
-                }`}
-              />
-
-              {soundOn ? "Sound On" : "Sound Off"}
-            </button>
-
-          </div>
-
-        </div>
-      </section>
-
-      {/* =====================================================
-          WHY FOBCA
-      ===================================================== */}
-
-      <section
-        className="bg-[#101b18] px-6 py-24 text-white sm:px-10 sm:py-32 lg:px-16 lg:py-40"
-      >
-
-        <div className="mx-auto max-w-[1400px]">
-
-          <div className="grid gap-12 lg:grid-cols-[0.75fr_1.25fr] lg:gap-24">
-
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.3em] text-white/40">
-                Why Fobca?
-              </p>
-
-              <h2 className="mt-6 max-w-md font-serif text-4xl leading-[0.95] tracking-[-0.04em] sm:text-5xl lg:text-6xl">
-                Selected with
-                <span className="font-light italic text-[#d8961c]">
-                  {" "}purpose.
-                </span>
-              </h2>
-            </div>
-
-            <div className="divide-y divide-white/10 border-y border-white/10">
-
-              {/* PREMIUM SELECTION */}
-              <div className="grid gap-3 py-7 sm:grid-cols-[220px_1fr] sm:gap-8">
-                <h3 className="font-serif text-xl">
-                  Premium Selection
-                </h3>
-
-                <p className="text-sm leading-7 text-white/50">
-                  Distinctive furniture designs sourced internationally.
-                </p>
-              </div>
-
-              {/* QUALITY */}
-              <div className="grid gap-3 py-7 sm:grid-cols-[220px_1fr] sm:gap-8">
-                <h3 className="font-serif text-xl">
-                  Quality &amp; Functionality
-                </h3>
-
-                <p className="text-sm leading-7 text-white/50">
-                  Products selected for comfort, practicality and durability.
-                </p>
-              </div>
-
-              {/* CONVENIENT SHOPPING */}
-              <div className="grid gap-3 py-7 sm:grid-cols-[220px_1fr] sm:gap-8">
-                <h3 className="font-serif text-xl">
-                  Convenient Shopping
-                </h3>
-
-                <p className="text-sm leading-7 text-white/50">
-                  Browse and order from anywhere.
-                </p>
-              </div>
-
-              {/* RELIABLE DELIVERY */}
-              <div className="grid gap-3 py-7 sm:grid-cols-[220px_1fr] sm:gap-8">
-                <h3 className="font-serif text-xl">
-                  Reliable Delivery
-                </h3>
-
-                <p className="text-sm leading-7 text-white/50">
-                  We coordinate delivery to your location.
-                </p>
-              </div>
-
-              {/* CUSTOMER SERVICE */}
-              <div className="grid gap-3 py-7 sm:grid-cols-[220px_1fr] sm:gap-8">
-                <h3 className="font-serif text-xl">
-                  Customer-Focused Service
-                </h3>
-
-                <p className="text-sm leading-7 text-white/50">
-                  We are available before and after your purchase.
-                </p>
-              </div>
-
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* =====================================================
-          FURNITURE FEATURE
-      ===================================================== */}
-
-      <section className="bg-[#ded8ca] px-6 py-24 sm:px-10 sm:py-32 lg:px-16 lg:py-40">
-
-        <div className="mx-auto grid max-w-[1400px] gap-16 lg:grid-cols-[1fr_1.15fr] lg:items-center lg:gap-24">
-
-          <div>
-
-            <p className="text-[10px] uppercase tracking-[0.3em] text-[#174b32]/70">
-              FOBCA Furniture
-            </p>
-
-            <h2 className="mt-6 max-w-xl font-serif text-5xl leading-[0.95] tracking-[-0.04em] text-[#101b18] sm:text-6xl lg:text-7xl">
-              Designed for
-              <span className="italic font-light">
-                {" "}living.
-              </span>
-            </h2>
-
-            <p className="mt-8 max-w-lg text-base leading-8 text-[#101b18]/60">
-              Discover carefully selected furniture pieces for homes, offices
-              and hospitality spaces. Thoughtful designs, quality materials and
-              timeless forms.
-            </p>
-
-            <button
-              onClick={() => navigate("/furniture")}
-              className="mt-5 border border-[#174b32] px-5 py-2 text-[10px] uppercase tracking-[0.25em] text-[#174b32] transition hover:bg-[#174b32] hover:text-white"
-            >
-              Enter furniture
-            </button>
-
-          </div>
-
-          <div className="relative aspect-[4/3] overflow-hidden bg-[#c8c0ae]">
-
-            <img
-              src={fobcaImage}
-              alt="FOBCA furniture"
-              className="h-full w-full object-cover transition duration-700 hover:scale-[1.02]"
-            />
-
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/45 to-transparent p-6 sm:p-8">
-              <span className="text-[9px] uppercase tracking-[0.25em] text-white/80">
-                Explore collection
-              </span>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* =====================================================
-          CUSTOMER FEEDBACK & ENQUIRIES
-      ===================================================== */}
-
-      <section
-        id="customer-feedback"
-        className="bg-[#f3f0e8] px-6 py-24 sm:px-10 sm:py-32 lg:px-16 lg:py-40"
-      >
-
-        <div className="mx-auto max-w-[1400px]">
-
-          <div className="grid gap-14 lg:grid-cols-[0.8fr_1.2fr] lg:gap-24">
-
-            {/* LEFT */}
-            <div>
-
-              <p className="text-[10px] uppercase tracking-[0.3em] text-[#174b32]/65">
-                Customer feedback
-              </p>
-
-              <h2 className="mt-6 max-w-lg font-serif text-5xl leading-[0.95] tracking-[-0.04em] sm:text-6xl">
-                We'd love to
-                <span className="font-light italic text-[#174b32]">
-                  {" "}hear from you.
-                </span>
-              </h2>
-
-              <p className="mt-7 max-w-md text-sm leading-7 text-[#101b18]/55">
-                Have a question, need help with an order, or want to share
-                your experience with FOBCA? Send us a message and our team
-                will get back to you.
-              </p>
-
-              <div className="mt-10 border-t border-[#101b18]/15 pt-6">
-
-                <p className="text-[9px] uppercase tracking-[0.25em] text-[#101b18]/40">
-                  Direct contact
-                </p>
-
-                <div className="mt-4 space-y-3">
-
-                  {storeSettings?.phone && (
-                    <a
-                      href={`tel:${storeSettings.phone}`}
-                      className="block text-sm text-[#101b18]/65 transition hover:text-[#174b32]"
-                    >
-                      {storeSettings.phone}
-                    </a>
-                  )}
-
-                  {storeSettings?.email && (
-                    <a
-                      href={`mailto:${storeSettings.email}`}
-                      className="block break-all text-sm text-[#101b18]/65 transition hover:text-[#174b32]"
-                    >
-                      {storeSettings.email}
-                    </a>
-                  )}
-
-                  {storeSettings?.whatsapp && (
-                    <a
-                      href={`https://wa.me/${storeSettings.whatsapp.replace(
-                        /\D/g,
-                        "",
-                      )}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="block text-sm text-[#101b18]/65 transition hover:text-[#174b32]"
-                    >
-                      WhatsApp
-                    </a>
-                  )}
-
-                </div>
-              </div>
-            </div>
-
-            {/* RIGHT - FORM */}
-            <div>
-
-              <form
-                onSubmit={handleMessageSubmit}
-                className="border-t border-[#101b18]/15 pt-8"
-              >
-
-                <div className="grid gap-8 sm:grid-cols-2">
-
-                  {/* NAME */}
-                  <div>
-                    <label
-                      htmlFor="customer-name"
-                      className="text-[9px] uppercase tracking-[0.2em] text-[#101b18]/40"
-                    >
-                      Your Name
-                    </label>
-
-                    <input
-                      id="customer-name"
-                      type="text"
-                      required
-                      value={messageForm.name}
-                      onChange={(event) =>
-                        setMessageForm((current) => ({
-                          ...current,
-                          name: event.target.value,
-                        }))
-                      }
-                      className="mt-3 w-full border-0 border-b border-[#101b18]/20 bg-transparent px-0 py-3 text-sm text-[#101b18] outline-none transition placeholder:text-[#101b18]/25 focus:border-[#174b32]"
-                      placeholder="Enter your name"
-                    />
-                  </div>
-
-                  {/* EMAIL */}
-                  <div>
-                    <label
-                      htmlFor="customer-email"
-                      className="text-[9px] uppercase tracking-[0.2em] text-[#101b18]/40"
-                    >
-                      Email Address
-                    </label>
-
-                    <input
-                      id="customer-email"
-                      type="email"
-                      required
-                      value={messageForm.email}
-                      onChange={(event) =>
-                        setMessageForm((current) => ({
-                          ...current,
-                          email: event.target.value,
-                        }))
-                      }
-                      className="mt-3 w-full border-0 border-b border-[#101b18]/20 bg-transparent px-0 py-3 text-sm text-[#101b18] outline-none transition placeholder:text-[#101b18]/25 focus:border-[#174b32]"
-                      placeholder="you@example.com"
-                    />
-                  </div>
-
-                  {/* PHONE */}
-                  <div className="sm:col-span-2">
-                    <label
-                      htmlFor="customer-phone"
-                      className="text-[9px] uppercase tracking-[0.2em] text-[#101b18]/40"
-                    >
-                      Phone Number
-                      <span className="ml-2 text-[#101b18]/25">
-                        Optional
-                      </span>
-                    </label>
-
-                    <input
-                      id="customer-phone"
-                      type="tel"
-                      value={messageForm.phone}
-                      onChange={(event) =>
-                        setMessageForm((current) => ({
-                          ...current,
-                          phone: event.target.value,
-                        }))
-                      }
-                      className="mt-3 w-full border-0 border-b border-[#101b18]/20 bg-transparent px-0 py-3 text-sm text-[#101b18] outline-none transition placeholder:text-[#101b18]/25 focus:border-[#174b32]"
-                      placeholder="0800 000 0000"
-                    />
-                  </div>
-
-                  {/* MESSAGE */}
-                  <div className="sm:col-span-2">
-                    <label
-                      htmlFor="customer-message"
-                      className="text-[9px] uppercase tracking-[0.2em] text-[#101b18]/40"
-                    >
-                      Message
-                    </label>
-
-                    <textarea
-                      id="customer-message"
-                      required
-                      rows={5}
-                      value={messageForm.message}
-                      onChange={(event) =>
-                        setMessageForm((current) => ({
-                          ...current,
-                          message: event.target.value,
-                        }))
-                      }
-                      className="mt-3 w-full resize-none border-0 border-b border-[#101b18]/20 bg-transparent px-0 py-3 text-sm leading-7 text-[#101b18] outline-none transition placeholder:text-[#101b18]/25 focus:border-[#174b32]"
-                      placeholder="How can we help you?"
-                    />
-                  </div>
-
-                </div>
-
-                {/* SUCCESS */}
-                {messageSent && (
-                  <p className="mt-6 text-xs leading-6 text-[#174b32]">
-                    Thank you. Your message has been received. We'll get
-                    back to you shortly.
-                  </p>
-                )}
-
-                {/* ERROR */}
-                {messageError && (
-                  <p className="mt-6 text-xs leading-6 text-red-700">
-                    {messageError}
-                  </p>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={messageSending}
-                  className="mt-8 inline-flex items-center gap-5 bg-[#174b32] px-6 py-4 text-[9px] uppercase tracking-[0.2em] text-white transition hover:bg-[#101b18] disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {messageSending
-                    ? "Sending..."
-                    : "Send Message"}
-
-                  <span className="text-base leading-none">
-                    →
-                  </span>
-                </button>
-
-              </form>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* =====================================================
-          CLOSING
-      ===================================================== */}
-
-      <section className="bg-[#f3f0e8] px-6 py-28 sm:px-10 sm:py-40 lg:px-16 lg:py-48">
-
-        <div className="mx-auto max-w-[1200px] text-center">
-
-          <p className="text-[10px] uppercase tracking-[0.35em] text-[#174b32]/60">
-            FOBCA LIMITED
-          </p>
-
-          <h2 className="mt-8 font-serif text-5xl leading-[0.95] tracking-[-0.04em] text-[#101b18] sm:text-6xl lg:text-8xl">
-            We are building
-            <br />
-            <span className="italic font-light">
-              what comes next.
-            </span>
-          </h2>
-
-          <p className="mx-auto mt-8 max-w-xl text-sm leading-7 text-[#101b18]/55 sm:text-base">
-            Furniture. Oil &amp; Gas. Construction. Architectural Design. A
-            growing company creating solutions for modern Nigeria.
-          </p>
-
-        </div>
-      </section>
-
-      {/* =====================================================
-          FOOTER
-      ===================================================== */}
-
-      <footer
-        id="contact"
-        className="bg-[#0d2d20] px-6 py-16 text-white sm:px-10 lg:px-16"
-      >
-
-        <div className="mx-auto max-w-[1400px]">
-
-          <div className="grid gap-12 border-b border-white/10 pb-12 md:grid-cols-[1fr_auto]">
-
-            {/* BRAND */}
-            <div>
-
-              <img
-                src="/assets/fobca-logo-source.png"
-                alt="FOBCA Limited"
-                className="h-14 w-auto object-contain brightness-0 invert"
-              />
-
-              <p className="mt-5 text-sm font-medium tracking-wide text-white/70">
-                FOBCA LIMITED
-                <span className="mx-2 text-white/25">
-                  |
-                </span>
-                RC No. 1816516
-              </p>
-
-              <p className="mt-2 text-sm font-medium tracking-wide text-white/70">
-                We realize your dreams.
-              </p>
-
-              <p className="mt-3 max-w-sm text-sm leading-7 text-white/45">
-                Premium Imported Furniture &amp; Home Solutions
-              </p>
-
-              <p className="mt-6 max-w-md text-[10px] uppercase leading-6 tracking-[0.13em] text-white/35">
-                Lagos, Nigeria
-                <span className="mx-2 text-white/20">
-                  ·
-                </span>
-                Online Furniture Business
-                <span className="mx-2 text-white/20">
-                  ·
-                </span>
-                Nationwide Delivery
-              </p>
-
-            </div>
-
-            {/* LINKS + CONTACT */}
-            <div className="grid grid-cols-2 gap-x-12 gap-y-10 sm:gap-x-20">
-
-              {/* EXPLORE */}
-              <div className="flex flex-col gap-4">
-
-                <span className="text-[9px] uppercase tracking-[0.2em] text-white/30">
-                  Explore
-                </span>
-
-                <button
-                  onClick={() => navigate("/furniture")}
-                  className="text-left text-sm text-white/60 transition hover:text-white"
-                >
-                  Furniture
-                </button>
-
-                <button
-                  onClick={() => navigate("/energy")}
-                  className="text-left text-sm text-white/60 transition hover:text-white"
-                >
-                  Oil &amp; Gas
-                </button>
-
-                <button
-                  onClick={() => navigate("/construction")}
-                  className="text-left text-sm text-white/60 transition hover:text-white"
-                >
-                  Construction
-                </button>
-
-                <button
-                  onClick={() => navigate("/architecture")}
-                  className="text-left text-sm text-white/60 transition hover:text-white"
-                >
-                  Architectural Design
-                </button>
-
-              </div>
-
-              {/* CONTACT */}
-              <div className="flex flex-col gap-4">
-
-                <span className="text-[9px] uppercase tracking-[0.2em] text-white/30">
-                  Contact
-                </span>
-
-                {/* PHONE */}
-                {storeSettings?.phone && (
-                  <a
-                    href={`tel:${storeSettings.phone}`}
-                    className="flex items-center gap-2 text-sm text-white/60 transition hover:text-white"
-                  >
-                    <span className="text-xs text-white/35">
-                      ☎
-                    </span>
-
-                    <span>
-                      {storeSettings.phone}
-                    </span>
-                  </a>
-                )}
-
-                {/* WHATSAPP */}
-                {storeSettings?.whatsapp && (
-                  <a
-                    href={`https://wa.me/${storeSettings.whatsapp.replace(
-                      /\D/g,
-                      "",
-                    )}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="flex items-center gap-2 text-sm text-white/60 transition hover:text-white"
-                  >
-                    <span className="text-xs text-white/35">
-                      💬
-                    </span>
-
-                    <span>
-                      WhatsApp
-                    </span>
-                  </a>
-                )}
-
-                {/* EMAIL */}
-                {storeSettings?.email && (
-                  <a
-                    href={`mailto:${storeSettings.email}`}
-                    className="flex items-start gap-2 break-all text-sm text-white/60 transition hover:text-white"
-                  >
-                    <span className="mt-0.5 shrink-0 text-xs text-white/35">
-                      ✉
-                    </span>
-
-                    <span>
-                      {storeSettings.email}
-                    </span>
-                  </a>
-                )}
-
-                {/* SOCIAL MEDIA */}
-                <div className="mt-3">
-
-                  <span className="mb-3 block text-[9px] uppercase tracking-[0.2em] text-white/30">
-                    Follow Us
-                  </span>
-
-                  <div className="flex flex-wrap gap-2">
-
-                    {/* FACEBOOK */}
-                    {storeSettings?.facebook_url && (
-                      <a
-                        href={storeSettings.facebook_url}
-                        target="_blank"
-                        rel="noreferrer"
-                        aria-label="Facebook"
-                        title="Facebook"
-                        className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-white/55 transition-all duration-300 hover:border-white/50 hover:bg-white hover:text-[#0d2d20]"
-                      >
-                        <FacebookIcon />
-                      </a>
-                    )}
-
-                    {/* INSTAGRAM */}
-                    {storeSettings?.instagram_url && (
-                      <a
-                        href={storeSettings.instagram_url}
-                        target="_blank"
-                        rel="noreferrer"
-                        aria-label="Instagram"
-                        title="Instagram"
-                        className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-white/55 transition-all duration-300 hover:border-white/50 hover:bg-white hover:text-[#0d2d20]"
-                      >
-                        <InstagramIcon />
-                      </a>
-                    )}
-
-                    {/* YOUTUBE */}
-                    {storeSettings?.youtube_url && (
-                      <a
-                        href={storeSettings.youtube_url}
-                        target="_blank"
-                        rel="noreferrer"
-                        aria-label="YouTube"
-                        title="YouTube"
-                        className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-white/55 transition-all duration-300 hover:border-white/50 hover:bg-white hover:text-[#0d2d20]"
-                      >
-                        <YouTubeIcon />
-                      </a>
-                    )}
-
-                    {/* LINKEDIN */}
-                    {storeSettings?.linkedin_url && (
-                      <a
-                        href={storeSettings.linkedin_url}
-                        target="_blank"
-                        rel="noreferrer"
-                        aria-label="LinkedIn"
-                        title="LinkedIn"
-                        className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-white/55 transition-all duration-300 hover:border-white/50 hover:bg-white hover:text-[#0d2d20]"
-                      >
-                        <LinkedInIcon />
-                      </a>
-                    )}
-
-                    {/* X */}
-                    {storeSettings?.x_url && (
-                      <a
-                        href={storeSettings.x_url}
-                        target="_blank"
-                        rel="noreferrer"
-                        aria-label="X"
-                        title="X"
-                        className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-white/55 transition-all duration-300 hover:border-white/50 hover:bg-white hover:text-[#0d2d20]"
-                      >
-                        <XIcon />
-                      </a>
-                    )}
-
-                  </div>
-                </div>
-
-                {!storeSettings && (
-                  <span className="text-sm text-white/35">
-                    Loading contact details...
-                  </span>
-                )}
-
-              </div>
-            </div>
-          </div>
-
-          {/* FOOTER BOTTOM */}
-          <div className="flex flex-col gap-3 pt-8 text-[9px] uppercase tracking-[0.2em] text-white/30 sm:flex-row sm:items-center sm:justify-between">
-
-            <span>
-              © {new Date().getFullYear()} Fobca Limited. All Rights Reserved.
-            </span>
-
-            <span>
-              We realize your dreams.
-            </span>
-
-            <button
-              onClick={() => navigate("/admin")}
-              className="text-left transition hover:text-white"
-            >
-              Admin
-            </button>
-
-          </div>
-        </div>
-      </footer>
-
-    </div>
-  );
+
+      {/* =====================================================
+
+          ABOUT
+
+      ===================================================== */}
+
+
+      <section
+
+        id="about"
+
+        className="relative overflow-hidden bg-[#f3f0e8] px-6 py-18 sm:px-10 sm:py-32 lg:px-16 lg:py-40"
+
+      >
+
+
+
+        <div className="pointer-events-none absolute right-[-120px] top-[-120px] h-[420px] w-[420px] rounded-full border border-[#174b32]/10" />
+
+
+
+        <div className="pointer-events-none absolute right-[-70px] top-[-70px] h-[320px] w-[320px] rounded-full border border-[#174b32]/10" />
+
+
+
+        <div className="relative mx-auto max-w-[1400px]">
+
+
+
+          <div className="flex items-center justify-between border-b border-[#101b18]/15 pb-5">
+
+            <div className="flex items-center gap-4">
+
+              <span className="h-1.5 w-1.5 rounded-full bg-[#174b32]" />
+
+
+
+              <span className="text-[9px] uppercase tracking-[0.3em] text-[#101b18]/55">
+
+                About Fobca
+
+              </span>
+
+            </div>
+
+
+
+            <span className="font-mono text-[9px] tracking-[0.2em] text-[#101b18]/35">
+
+              01 / 05
+
+            </span>
+
+          </div>
+
+
+
+          {/* ABOUT STATEMENT */}
+
+          <div className="mt-4 lg:mt-16">
+
+            <p className="max-w-4xl font-serif text-xl leading-[1.2] tracking-[-0.02em] text-[#101b18] sm:text-3xl md:text-4xl lg:text-6xl">
+
+              Fobca Limited is a premium furniture company offering
+
+              <span className="font-light italic text-[#174b32]">
+
+                {" "}
+
+                carefully selected imported furniture
+
+              </span>{" "}
+
+              from China, Dubai, Egypt and Turkiye designed to bring comfort,
+
+              elegance and functionality into modern spaces.
+
+            </p>
+
+          </div>
+
+
+
+          {/* APPROACH + COMPANY DESCRIPTION */}
+
+          <div className="mt-6 grid gap-16 border-t border-[#101b18]/15 pt-6 lg:grid-cols-[0.7fr_1.3fr] lg:gap-24 lg:pt-16">
+
+
+
+            {/* OUR APPROACH */}
+
+            <div>
+
+              <p className="text-[9px] uppercase tracking-[0.28em] text-[#101b18]/40">
+
+                Our Approach
+
+              </p>
+
+
+
+              <div className="mt-8 flex items-start gap-5">
+
+                <span className="mt-1 font-serif text-5xl leading-none text-[#174b32]/25">
+
+                  “
+
+                </span>
+
+
+
+                <p className="max-w-xs font-serif text-xl leading-8 text-[#101b18]/75">
+
+                  We don't just sell furniture.
+
+                  <br />
+
+                  We provide carefully selected furniture solutions that bring
+
+                  comfort, functionality and elegance into your home, office
+
+                  and commercial spaces.
+
+                </p>
+
+              </div>
+
+            </div>
+
+
+
+            {/* COMPANY DESCRIPTION */}
+
+            <div className="max-w-md">
+
+
+
+
+
+              {/* COMPACT BRAND SIGNATURE */}
+
+              <div className="mt-6 border-t border-[#101b18]/15 pt-4">
+
+                <p className="font-serif text-2xl leading-none text-[#101b18]">
+
+                  Fobca Limited
+
+                </p>
+
+
+
+                <p className="mt-2 origin-left -skew-x-10 font-serif text-lg italic leading-none tracking-[-0.025em] text-[#174b32]">
+
+                  We realize your dreams.
+
+                </p>
+
+              </div>
+
+
+
+              {/* ORIGIN */}
+
+              <div className="mt-5">
+
+                <span className="text-[8px] uppercase tracking-[0.25em] text-[#101b18]/40">
+
+                  China · Dubai · Egypt · Turkiye
+
+                </span>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+
+          {/* HOMEPAGE STORE */}
+
+          <div className="mt-6 border-t border-[#101b18]/15 pt-14 sm:mt-24 sm:pt-16">
+
+
+
+            <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
+
+              <div>
+
+                <p className="text-[9px] uppercase tracking-[0.3em] text-[#101b18]/40">
+
+                  From the collection
+
+                </p>
+
+
+
+                <h3 className="mt-4 max-w-2xl font-serif text-3xl leading-[1.05] tracking-[-0.03em] text-[#101b18] sm:text-4xl lg:text-5xl">
+
+                  Pieces chosen for
+
+                  <span className="italic font-light text-[#174b32]">
+
+                    {" "}
+
+                    beautiful spaces.
+
+                  </span>
+
+                </h3>
+
+              </div>
+
+            </div>
+
+
+
+            <div className="mt-12 grid grid-cols-2 gap-x-4 gap-y-12 sm:grid-cols-3 lg:grid-cols-4 lg:gap-x-6">
+
+              {featuredProducts.map((product, index) => (
+
+                <article
+
+                  key={product.id}
+
+                  className="group"
+
+                >
+
+
+
+                  <button
+
+                    onClick={() => navigate("/furniture")}
+
+                    className="relative block aspect-[4/5] w-full overflow-hidden bg-[#e2ddd2] text-left"
+
+                  >
+
+
+
+                    {product.image_url ? (
+
+                      <img
+
+                        src={product.image_url}
+
+                        alt={product.name}
+
+                        className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035]"
+
+                      />
+
+                    ) : (
+
+                      <ImagePlaceholder label={product.name} />
+
+                    )}
+
+
+
+                    <span className="absolute left-4 top-4 font-mono text-[8px] tracking-[0.15em] text-white/75">
+
+                      {String(index + 1).padStart(2, "0")}
+
+                    </span>
+
+
+
+                    <span className="absolute bottom-4 right-4 flex h-9 w-9 items-center justify-center border border-white/50 bg-black/10 text-sm text-white opacity-0 backdrop-blur-sm transition-all duration-300 group-hover:opacity-100">
+
+                      ↗
+
+                    </span>
+
+                  </button>
+
+
+
+                  <div className="pt-5">
+
+                    <div className="flex items-start justify-between gap-4">
+
+
+
+                      <h4 className="font-serif text-lg leading-[1.1] tracking-[-0.015em] text-[#101b18] sm:text-xl">
+
+                        {product.name}
+
+                      </h4>
+
+
+
+                      <p className="whitespace-nowrap pt-1 text-[10px] tracking-[0.03em] text-[#101b18]/55">
+
+                        ₦{Number(product.price).toLocaleString("en-NG")}
+
+                      </p>
+
+                    </div>
+
+
+
+                    <button
+
+                      onClick={() => navigate("/furniture")}
+
+                      className="mt-2 flex w-full items-center justify-between border border-[#101b18]/20 px-4 py-1 text-left transition-all duration-300 hover:border-[#174b32] hover:bg-[#174b32] hover:text-white"
+
+                    >
+
+                      <span className="text-[8px] uppercase tracking-[0.2em]">
+
+                        Order this piece
+
+                      </span>
+
+
+
+                      <span className="text-sm transition-transform duration-300 group-hover:translate-x-1">
+
+                        →
+
+                      </span>
+
+                    </button>
+
+                  </div>
+
+                </article>
+
+              ))}
+
+            </div>
+
+
+
+            <div className="mt-14 flex flex-col gap-4 border-t border-[#101b18]/15 pt-6 sm:flex-row sm:items-center sm:justify-between">
+
+
+
+              <p className="max-w-md text-xs leading-6 text-[#101b18]/45">
+
+                Explore our collection of bedroom sets, sofa sets, dining
+
+                sets, adjustable coffee tables, rocking chairs with footstools
+
+                and bedside table lamps — selected to bring comfort, function
+
+                and style into your space.
+
+              </p>
+
+
+
+              <button
+
+                onClick={() => navigate("/furniture")}
+
+                className="group flex w-fit items-center gap-3 text-[9px] uppercase tracking-[0.25em] text-[#174b32]"
+
+              >
+
+                Explore all furniture
+
+
+
+                <span className="transition-transform duration-300 group-hover:translate-x-1">
+
+                  →
+
+                </span>
+
+              </button>
+
+
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+
+      {/* =====================================================
+
+          DEPARTMENTS
+
+      ===================================================== */}
+
+
+
+      <section
+
+        id="departments"
+
+        className="fobca-reveal bg-[#101b18] px-6 py-24 text-white sm:px-10 sm:py-32 lg:px-16 lg:py-40"
+
+      >
+
+
+
+        <div className="mx-auto max-w-[1400px]">
+
+
+
+          <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
+
+
+
+            <div>
+
+              <p className="text-[10px] uppercase tracking-[0.3em] text-white/45">
+
+                Our departments
+
+              </p>
+
+
+
+              <h2 className="mt-5 max-w-2xl font-serif text-4xl leading-none tracking-[-0.03em] sm:text-5xl lg:text-6xl">
+
+                More than
+
+                <span className="font-light italic">
+
+                  {" "}furniture.
+
+                </span>
+
+              </h2>
+
+            </div>
+
+
+
+            <p className="max-w-sm text-sm leading-7 text-white/50">
+
+              Explore the different sides of FOBCA, from furniture to the
+
+              businesses we're building next.
+
+            </p>
+
+
+
+          </div>
+
+
+
+          <div className="mt-20 divide-y divide-white/10 border-y border-white/10">
+
+
+
+            {departments.map((department, index) => (
+
+              <button
+
+                key={department.path}
+
+                onClick={() => navigate(department.path)}
+
+                className="group flex w-full items-center justify-between py-8 text-left sm:py-10"
+
+              >
+
+
+
+                <div className="flex items-center gap-6 sm:gap-10">
+
+
+
+                  <span className="font-mono text-[10px] text-white/25">
+
+                    {String(index + 1).padStart(2, "0")}
+
+                  </span>
+
+
+
+                  <span
+
+                    className={`font-serif text-3xl tracking-[-0.02em] sm:text-4xl lg:text-5xl ${
+
+                      department.available
+
+                        ? "text-white transition group-hover:translate-x-2"
+
+                        : "text-white/35 transition group-hover:text-white/55"
+
+                    }`}
+
+                  >
+
+                    <span className="text-[#d8961c]">
+
+                      {department.name.charAt(0)}
+
+                    </span>
+
+
+
+                    {department.name.slice(1)}
+
+                  </span>
+
+
+
+                </div>
+
+
+
+                <div className="flex items-center gap-5">
+
+
+
+                  <span className="hidden text-[9px] uppercase tracking-[0.2em] text-white/35 sm:block">
+
+                    {department.available
+
+                      ? "Explore"
+
+                      : "Coming soon"}
+
+                  </span>
+
+
+
+                  <span className="text-xl text-white/40 transition group-hover:translate-x-2 group-hover:text-white">
+
+                    →
+
+                  </span>
+
+
+
+                </div>
+
+
+
+              </button>
+
+            ))}
+
+
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+
+      {/* =====================================================
+
+          OUR BUSINESSES & AREAS OF EXPANSION
+
+      ===================================================== */}
+
+
+
+      <section
+
+        id="businesses"
+
+        className="fobca-reveal bg-[#f3f0e8] px-6 py-24 sm:px-10 sm:py-32 lg:px-16 lg:py-40"
+
+      >
+
+
+
+        <div className="mx-auto max-w-[1400px]">
+
+
+
+          <div className="grid gap-10 border-b border-[#101b18]/15 pb-10 lg:grid-cols-[1fr_1.2fr] lg:items-end">
+
+
+
+            <div>
+
+              <p className="text-[10px] uppercase tracking-[0.3em] text-[#174b32]/65">
+
+                Our businesses
+
+              </p>
+
+
+
+              <h2 className="mt-5 max-w-3xl font-serif text-4xl leading-[0.95] tracking-[-0.04em] sm:text-5xl lg:text-7xl">
+
+                Our Businesses
+
+                <span className="font-light italic text-[#174b32]">
+
+                  {" "} &amp; Areas of Expansion
+
+                </span>
+
+              </h2>
+
+            </div>
+
+
+
+            <p className="max-w-xl text-sm leading-7 text-[#101b18]/55 lg:ml-auto">
+
+              Fobca Limited is building a diversified business group with
+
+              interests in furniture, transportation, real estate, building
+
+              and interior decoration, construction, architectural design,
+
+              and the Oil &amp; Gas sector.
+
+            </p>
+
+
+
+          </div>
+
+
+
+          <div className="mt-16 divide-y divide-[#101b18]/10 border-y border-[#101b18]/10">
+
+
+
+            {/* FURNITURE */}
+
+            <div className="grid gap-4 py-7 sm:grid-cols-[80px_1fr_auto] sm:items-center sm:gap-8">
+
+              <span className="font-mono text-[10px] text-[#101b18]/30">
+
+                01
+
+              </span>
+
+
+
+              <div>
+
+                <h3 className="font-serif text-2xl tracking-[-0.02em] sm:text-3xl">
+
+                  Fobca Furniture
+
+                </h3>
+
+
+
+                <p className="mt-2 max-w-2xl text-xs leading-6 text-[#101b18]/50 sm:text-sm">
+
+                  Premium imported furniture and furnishing solutions.
+
+                </p>
+
+              </div>
+
+
+
+              <button
+
+                onClick={() => navigate("/furniture")}
+
+                className="flex w-fit items-center gap-3 text-[9px] uppercase tracking-[0.2em] text-[#174b32]"
+
+              >
+
+                Explore
+
+                <span>→</span>
+
+              </button>
+
+            </div>
+
+
+
+            {/* FOBCA LINE */}
+
+            <div className="grid gap-4 py-7 sm:grid-cols-[80px_1fr_auto] sm:items-center sm:gap-8">
+
+              <span className="font-mono text-[10px] text-[#101b18]/30">
+
+                02
+
+              </span>
+
+
+
+              <div>
+
+                <h3 className="font-serif text-2xl tracking-[-0.02em] sm:text-3xl">
+
+                  Fobca Line
+
+                </h3>
+
+
+
+                <p className="mt-2 max-w-2xl text-xs leading-6 text-[#101b18]/50 sm:text-sm">
+
+                  Transportation and mobility solutions.
+
+                </p>
+
+              </div>
+
+
+
+              <span className="text-[9px] uppercase tracking-[0.2em] text-[#101b18]/30">
+
+                Coming soon
+
+              </span>
+
+            </div>
+
+
+
+            {/* FOBCA RESIDENCE */}
+
+            <div className="grid gap-4 py-7 sm:grid-cols-[80px_1fr_auto] sm:items-center sm:gap-8">
+
+              <span className="font-mono text-[10px] text-[#101b18]/30">
+
+                03
+
+              </span>
+
+
+
+              <div>
+
+                <h3 className="font-serif text-2xl tracking-[-0.02em] sm:text-3xl">
+
+                  Fobca Residence
+
+                </h3>
+
+
+
+                <p className="mt-2 max-w-2xl text-xs leading-6 text-[#101b18]/50 sm:text-sm">
+
+                  Residential property and lifestyle solutions.
+
+                </p>
+
+              </div>
+
+
+
+              <span className="text-[9px] uppercase tracking-[0.2em] text-[#101b18]/30">
+
+                Coming soon
+
+              </span>
+
+            </div>
+
+
+
+            {/* BUILDING & INTERIOR */}
+
+            <div className="grid gap-4 py-7 sm:grid-cols-[80px_1fr_auto] sm:items-center sm:gap-8">
+
+              <span className="font-mono text-[10px] text-[#101b18]/30">
+
+                04
+
+              </span>
+
+
+
+              <div>
+
+                <h3 className="font-serif text-2xl tracking-[-0.02em] sm:text-3xl">
+
+                  Building &amp; Interior Decorations
+
+                </h3>
+
+
+
+                <p className="mt-2 max-w-2xl text-xs leading-6 text-[#101b18]/50 sm:text-sm">
+
+                  Building finishing, interior decoration and space
+
+                  transformation.
+
+                </p>
+
+              </div>
+
+
+
+              <span className="text-[9px] uppercase tracking-[0.2em] text-[#101b18]/30">
+
+                Coming soon
+
+              </span>
+
+            </div>
+
+
+
+            {/* CONSTRUCTION */}
+
+            <div className="grid gap-4 py-7 sm:grid-cols-[80px_1fr_auto] sm:items-center sm:gap-8">
+
+              <span className="font-mono text-[10px] text-[#101b18]/30">
+
+                05
+
+              </span>
+
+
+
+              <div>
+
+                <h3 className="font-serif text-2xl tracking-[-0.02em] sm:text-3xl">
+
+                  Construction
+
+                </h3>
+
+
+
+                <p className="mt-2 max-w-2xl text-xs leading-6 text-[#101b18]/50 sm:text-sm">
+
+                  Construction and property development.
+
+                </p>
+
+              </div>
+
+
+
+              <span className="text-[9px] uppercase tracking-[0.2em] text-[#101b18]/30">
+
+                Coming soon
+
+              </span>
+
+            </div>
+
+
+
+            {/* ARCHITECTURAL DESIGNS */}
+
+            <div className="grid gap-4 py-7 sm:grid-cols-[80px_1fr_auto] sm:items-center sm:gap-8">
+
+              <span className="font-mono text-[10px] text-[#101b18]/30">
+
+                06
+
+              </span>
+
+
+
+              <div>
+
+                <h3 className="font-serif text-2xl tracking-[-0.02em] sm:text-3xl">
+
+                  Architectural Designs
+
+                </h3>
+
+
+
+                <p className="mt-2 max-w-2xl text-xs leading-6 text-[#101b18]/50 sm:text-sm">
+
+                  Architectural planning and creative building designs.
+
+                </p>
+
+              </div>
+
+
+
+              <span className="text-[9px] uppercase tracking-[0.2em] text-[#101b18]/30">
+
+                Coming soon
+
+              </span>
+
+            </div>
+
+
+
+            {/* OIL & GAS */}
+
+            <div className="grid gap-4 py-7 sm:grid-cols-[80px_1fr_auto] sm:items-center sm:gap-8">
+
+              <span className="font-mono text-[10px] text-[#101b18]/30">
+
+                07
+
+              </span>
+
+
+
+              <div>
+
+                <h3 className="font-serif text-2xl tracking-[-0.02em] sm:text-3xl">
+
+                  Oil &amp; Gas
+
+                </h3>
+
+
+
+                <p className="mt-2 max-w-2xl text-xs leading-6 text-[#101b18]/50 sm:text-sm">
+
+                  Future business interests and opportunities within the
+
+                  Oil &amp; Gas sector.
+
+                </p>
+
+              </div>
+
+
+
+              <span className="text-[9px] uppercase tracking-[0.2em] text-[#101b18]/30">
+
+                Coming soon
+
+              </span>
+
+            </div>
+
+
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+
+      {/* =====================================================
+
+          FOBCA FILM
+
+      ===================================================== */}
+
+
+
+      <section className="fobca-reveal bg-[#101b18] px-6 py-24 text-white sm:px-10 sm:py-32 lg:px-16 lg:py-40">
+
+
+
+        <div className="mx-auto max-w-[1400px]">
+
+
+
+          <div className="mb-10 flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
+
+
+
+            <div>
+
+              <p className="text-[10px] uppercase tracking-[0.3em] text-white/40">
+
+                The FOBCA experience
+
+              </p>
+
+
+
+              <h2 className="mt-5 max-w-3xl font-serif text-4xl leading-[0.95] tracking-[-0.04em] sm:text-5xl lg:text-7xl">
+
+                A closer look at
+
+                <span className="font-light italic text-[#d8961c]">
+
+                  {" "}FOBCA.
+
+                </span>
+
+              </h2>
+
+            </div>
+
+
+
+            <p className="max-w-sm text-sm leading-7 text-white/45">
+
+              Discover the spaces, details and moments behind the brand.
+
+            </p>
+
+
+
+          </div>
+
+
+
+          <div className="relative overflow-hidden bg-black">
+
+
+
+            <video
+
+              className="block aspect-video w-full object-cover"
+
+              src={heroVideo}
+
+              autoPlay
+
+              muted={!soundOn}
+
+              loop
+
+              playsInline
+
+              preload="auto"
+
+              controls
+
+            />
+
+
+
+            <button
+
+              onClick={toggleSound}
+
+              aria-label={
+
+                soundOn
+
+                  ? "Mute video"
+
+                  : "Turn video sound on"
+
+              }
+
+              className="absolute bottom-5 right-5 z-20 flex items-center gap-3 border border-white/30 bg-black/20 px-4 py-2 text-[9px] uppercase tracking-[0.18em] text-white/80 backdrop-blur-sm transition hover:border-white hover:text-white sm:bottom-6 sm:right-6"
+
+            >
+
+              <span
+
+                className={`h-1.5 w-1.5 rounded-full ${
+
+                  soundOn
+
+                    ? "bg-white"
+
+                    : "border border-white/70"
+
+                }`}
+
+              />
+
+
+
+              {soundOn ? "Sound On" : "Sound Off"}
+
+            </button>
+
+
+
+          </div>
+
+
+
+        </div>
+
+      </section>
+
+
+
+      {/* =====================================================
+
+          WHY FOBCA
+
+      ===================================================== */}
+
+
+
+      <section
+
+        className="fobca-reveal bg-[#101b18] px-6 py-24 text-white sm:px-10 sm:py-32 lg:px-16 lg:py-40"
+
+      >
+
+
+
+        <div className="mx-auto max-w-[1400px]">
+
+
+
+          <div className="grid gap-12 lg:grid-cols-[0.75fr_1.25fr] lg:gap-24">
+
+
+
+            <div>
+
+              <p className="text-[10px] uppercase tracking-[0.3em] text-white/40">
+
+                Why Fobca?
+
+              </p>
+
+
+
+              <h2 className="mt-6 max-w-md font-serif text-4xl leading-[0.95] tracking-[-0.04em] sm:text-5xl lg:text-6xl">
+
+                Selected with
+
+                <span className="font-light italic text-[#d8961c]">
+
+                  {" "}purpose.
+
+                </span>
+
+              </h2>
+
+            </div>
+
+
+
+            <div className="divide-y divide-white/10 border-y border-white/10">
+
+
+
+              {/* PREMIUM SELECTION */}
+
+              <div className="grid gap-3 py-7 sm:grid-cols-[220px_1fr] sm:gap-8">
+
+                <h3 className="font-serif text-xl">
+
+                  Premium Selection
+
+                </h3>
+
+
+
+                <p className="text-sm leading-7 text-white/50">
+
+                  Distinctive furniture designs sourced internationally.
+
+                </p>
+
+              </div>
+
+
+
+              {/* QUALITY */}
+
+              <div className="grid gap-3 py-7 sm:grid-cols-[220px_1fr] sm:gap-8">
+
+                <h3 className="font-serif text-xl">
+
+                  Quality &amp; Functionality
+
+                </h3>
+
+
+
+                <p className="text-sm leading-7 text-white/50">
+
+                  Products selected for comfort, practicality and durability.
+
+                </p>
+
+              </div>
+
+
+
+              {/* CONVENIENT SHOPPING */}
+
+              <div className="grid gap-3 py-7 sm:grid-cols-[220px_1fr] sm:gap-8">
+
+                <h3 className="font-serif text-xl">
+
+                  Convenient Shopping
+
+                </h3>
+
+
+
+                <p className="text-sm leading-7 text-white/50">
+
+                  Browse and order from anywhere.
+
+                </p>
+
+              </div>
+
+
+
+              {/* RELIABLE DELIVERY */}
+
+              <div className="grid gap-3 py-7 sm:grid-cols-[220px_1fr] sm:gap-8">
+
+                <h3 className="font-serif text-xl">
+
+                  Reliable Delivery
+
+                </h3>
+
+
+
+                <p className="text-sm leading-7 text-white/50">
+
+                  We coordinate delivery to your location.
+
+                </p>
+
+              </div>
+
+
+
+              {/* CUSTOMER SERVICE */}
+
+              <div className="grid gap-3 py-7 sm:grid-cols-[220px_1fr] sm:gap-8">
+
+                <h3 className="font-serif text-xl">
+
+                  Customer-Focused Service
+
+                </h3>
+
+
+
+                <p className="text-sm leading-7 text-white/50">
+
+                  We are available before and after your purchase.
+
+                </p>
+
+              </div>
+
+
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+
+      {/* =====================================================
+
+          FURNITURE FEATURE
+
+      ===================================================== */}
+
+
+
+      <section className="bg-[#ded8ca] px-6 py-24 sm:px-10 sm:py-32 lg:px-16 lg:py-40">
+
+
+
+        <div className="mx-auto grid max-w-[1400px] gap-16 lg:grid-cols-[1fr_1.15fr] lg:items-center lg:gap-24">
+
+
+
+          <div>
+
+
+
+            <p className="text-[10px] uppercase tracking-[0.3em] text-[#174b32]/70">
+
+              FOBCA Furniture
+
+            </p>
+
+
+
+            <h2 className="mt-6 max-w-xl font-serif text-5xl leading-[0.95] tracking-[-0.04em] text-[#101b18] sm:text-6xl lg:text-7xl">
+
+              Designed for
+
+              <span className="italic font-light">
+
+                {" "}living.
+
+              </span>
+
+            </h2>
+
+
+
+            <p className="mt-8 max-w-lg text-base leading-8 text-[#101b18]/60">
+
+              Discover carefully selected furniture pieces for homes, offices
+
+              and hospitality spaces. Thoughtful designs, quality materials and
+
+              timeless forms.
+
+            </p>
+
+
+
+            <button
+
+              onClick={() => navigate("/furniture")}
+
+              className="mt-5 border border-[#174b32] px-5 py-2 text-[10px] uppercase tracking-[0.25em] text-[#174b32] transition hover:bg-[#174b32] hover:text-white"
+
+            >
+
+              Enter furniture
+
+            </button>
+
+
+
+          </div>
+
+
+
+          <div className="relative aspect-[4/3] overflow-hidden bg-[#c8c0ae]">
+
+
+
+            <img
+
+              src={fobcaImage}
+
+              alt="FOBCA furniture"
+
+              className="h-full w-full object-cover transition duration-700 hover:scale-[1.02]"
+
+            />
+
+
+
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/45 to-transparent p-6 sm:p-8">
+
+              <span className="text-[9px] uppercase tracking-[0.25em] text-white/80">
+
+                Explore collection
+
+              </span>
+
+            </div>
+
+
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+
+      {/* =====================================================
+
+          CUSTOMER FEEDBACK & ENQUIRIES
+
+      ===================================================== */}
+
+
+
+      <section
+
+        id="customer-feedback"
+
+        className="fobca-reveal bg-[#f3f0e8] px-6 py-24 sm:px-10 sm:py-32 lg:px-16 lg:py-40"
+
+      >
+
+
+
+        <div className="mx-auto max-w-[1400px]">
+
+
+
+          <div className="grid gap-14 lg:grid-cols-[0.8fr_1.2fr] lg:gap-24">
+
+
+
+            {/* LEFT */}
+
+            <div>
+
+
+
+              <p className="text-[10px] uppercase tracking-[0.3em] text-[#174b32]/65">
+
+                Customer feedback
+
+              </p>
+
+
+
+              <h2 className="mt-6 max-w-lg font-serif text-5xl leading-[0.95] tracking-[-0.04em] sm:text-6xl">
+
+                We'd love to
+
+                <span className="font-light italic text-[#174b32]">
+
+                  {" "}hear from you.
+
+                </span>
+
+              </h2>
+
+
+
+              <p className="mt-7 max-w-md text-sm leading-7 text-[#101b18]/55">
+
+                Have a question, need help with an order, or want to share
+
+                your experience with FOBCA? Send us a message and our team
+
+                will get back to you.
+
+              </p>
+
+
+
+              <div className="mt-10 border-t border-[#101b18]/15 pt-6">
+
+
+
+                <p className="text-[9px] uppercase tracking-[0.25em] text-[#101b18]/40">
+
+                  Direct contact
+
+                </p>
+
+
+
+                <div className="mt-4 space-y-3">
+
+
+
+                  {storeSettings?.phone && (
+
+                    <a
+
+                      href={`tel:${storeSettings.phone}`}
+
+                      className="block text-sm text-[#101b18]/65 transition hover:text-[#174b32]"
+
+                    >
+
+                      {storeSettings.phone}
+
+                    </a>
+
+                  )}
+
+
+
+                  {storeSettings?.email && (
+
+                    <a
+
+                      href={`mailto:${storeSettings.email}`}
+
+                      className="block break-all text-sm text-[#101b18]/65 transition hover:text-[#174b32]"
+
+                    >
+
+                      {storeSettings.email}
+
+                    </a>
+
+                  )}
+
+
+
+                  {storeSettings?.whatsapp && (
+
+                    <a
+
+                      href={`https://wa.me/${storeSettings.whatsapp.replace(
+
+                        /\D/g,
+
+                        "",
+
+                      )}`}
+
+                      target="_blank"
+
+                      rel="noreferrer"
+
+                      className="block text-sm text-[#101b18]/65 transition hover:text-[#174b32]"
+
+                    >
+
+                      WhatsApp
+
+                    </a>
+
+                  )}
+
+
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+
+            {/* RIGHT - FORM */}
+
+            <div>
+
+
+
+              <form
+
+                onSubmit={handleMessageSubmit}
+
+                className="border-t border-[#101b18]/15 pt-8"
+
+              >
+
+
+
+                <div className="grid gap-8 sm:grid-cols-2">
+
+
+
+                  {/* NAME */}
+
+                  <div>
+
+                    <label
+
+                      htmlFor="customer-name"
+
+                      className="text-[9px] uppercase tracking-[0.2em] text-[#101b18]/40"
+
+                    >
+
+                      Your Name
+
+                    </label>
+
+
+
+                    <input
+
+                      id="customer-name"
+
+                      type="text"
+
+                      required
+
+                      value={messageForm.name}
+
+                      onChange={(event) =>
+
+                        setMessageForm((current) => ({
+
+                          ...current,
+
+                          name: event.target.value,
+
+                        }))
+
+                      }
+
+                      className="mt-3 w-full border-0 border-b border-[#101b18]/20 bg-transparent px-0 py-3 text-sm text-[#101b18] outline-none transition placeholder:text-[#101b18]/25 focus:border-[#174b32]"
+
+                      placeholder="Enter your name"
+
+                    />
+
+                  </div>
+
+
+
+                  {/* EMAIL */}
+
+                  <div>
+
+                    <label
+
+                      htmlFor="customer-email"
+
+                      className="text-[9px] uppercase tracking-[0.2em] text-[#101b18]/40"
+
+                    >
+
+                      Email Address
+
+                    </label>
+
+
+
+                    <input
+
+                      id="customer-email"
+
+                      type="email"
+
+                      required
+
+                      value={messageForm.email}
+
+                      onChange={(event) =>
+
+                        setMessageForm((current) => ({
+
+                          ...current,
+
+                          email: event.target.value,
+
+                        }))
+
+                      }
+
+                      className="mt-3 w-full border-0 border-b border-[#101b18]/20 bg-transparent px-0 py-3 text-sm text-[#101b18] outline-none transition placeholder:text-[#101b18]/25 focus:border-[#174b32]"
+
+                      placeholder="you@example.com"
+
+                    />
+
+                  </div>
+
+
+
+                  {/* PHONE */}
+
+                  <div className="sm:col-span-2">
+
+                    <label
+
+                      htmlFor="customer-phone"
+
+                      className="text-[9px] uppercase tracking-[0.2em] text-[#101b18]/40"
+
+                    >
+
+                      Phone Number
+
+                      <span className="ml-2 text-[#101b18]/25">
+
+                        Optional
+
+                      </span>
+
+                    </label>
+
+
+
+                    <input
+
+                      id="customer-phone"
+
+                      type="tel"
+
+                      value={messageForm.phone}
+
+                      onChange={(event) =>
+
+                        setMessageForm((current) => ({
+
+                          ...current,
+
+                          phone: event.target.value,
+
+                        }))
+
+                      }
+
+                      className="mt-3 w-full border-0 border-b border-[#101b18]/20 bg-transparent px-0 py-3 text-sm text-[#101b18] outline-none transition placeholder:text-[#101b18]/25 focus:border-[#174b32]"
+
+                      placeholder="0800 000 0000"
+
+                    />
+
+                  </div>
+
+
+
+                  {/* MESSAGE */}
+
+                  <div className="sm:col-span-2">
+
+                    <label
+
+                      htmlFor="customer-message"
+
+                      className="text-[9px] uppercase tracking-[0.2em] text-[#101b18]/40"
+
+                    >
+
+                      Message
+
+                    </label>
+
+
+
+                    <textarea
+
+                      id="customer-message"
+
+                      required
+
+                      rows={5}
+
+                      value={messageForm.message}
+
+                      onChange={(event) =>
+
+                        setMessageForm((current) => ({
+
+                          ...current,
+
+                          message: event.target.value,
+
+                        }))
+
+                      }
+
+                      className="mt-3 w-full resize-none border-0 border-b border-[#101b18]/20 bg-transparent px-0 py-3 text-sm leading-7 text-[#101b18] outline-none transition placeholder:text-[#101b18]/25 focus:border-[#174b32]"
+
+                      placeholder="How can we help you?"
+
+                    />
+
+                  </div>
+
+
+
+                </div>
+
+
+
+                {/* SUCCESS */}
+
+                {messageSent && (
+
+                  <p className="mt-6 text-xs leading-6 text-[#174b32]">
+
+                    Thank you. Your message has been received. We'll get
+
+                    back to you shortly.
+
+                  </p>
+
+                )}
+
+
+
+                {/* ERROR */}
+
+                {messageError && (
+
+                  <p className="mt-6 text-xs leading-6 text-red-700">
+
+                    {messageError}
+
+                  </p>
+
+                )}
+
+
+
+                <button
+
+                  type="submit"
+
+                  disabled={messageSending}
+
+                  className="mt-8 inline-flex items-center gap-5 bg-[#174b32] px-6 py-4 text-[9px] uppercase tracking-[0.2em] text-white transition hover:bg-[#101b18] disabled:cursor-not-allowed disabled:opacity-50"
+
+                >
+
+                  {messageSending
+
+                    ? "Sending..."
+
+                    : "Send Message"}
+
+
+
+                  <span className="text-base leading-none">
+
+                    →
+
+                  </span>
+
+                </button>
+
+
+
+              </form>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+
+      {/* =====================================================
+
+          CLOSING
+
+      ===================================================== */}
+
+
+
+      <section className="fobca-reveal bg-[#f3f0e8] px-6 py-28 sm:px-10 sm:py-40 lg:px-16 lg:py-48">
+
+
+
+        <div className="mx-auto max-w-[1200px] text-center">
+
+
+
+          <p className="text-[10px] uppercase tracking-[0.35em] text-[#174b32]/60">
+
+            FOBCA LIMITED
+
+          </p>
+
+
+
+          <h2 className="mt-8 font-serif text-5xl leading-[0.95] tracking-[-0.04em] text-[#101b18] sm:text-6xl lg:text-8xl">
+
+            We are building
+
+            <br />
+
+            <span className="italic font-light">
+
+              what comes next.
+
+            </span>
+
+          </h2>
+
+
+
+          <p className="mx-auto mt-8 max-w-xl text-sm leading-7 text-[#101b18]/55 sm:text-base">
+
+            Furniture. Oil &amp; Gas. Construction. Architectural Design. A
+
+            growing company creating solutions for modern Nigeria.
+
+          </p>
+
+
+
+        </div>
+
+      </section>
+
+
+
+      {/* =====================================================
+
+          FOOTER
+
+      ===================================================== */}
+
+
+
+      <footer
+
+        id="contact"
+
+        className="bg-[#0d2d20] px-6 py-16 text-white sm:px-10 lg:px-16"
+
+      >
+
+
+
+        <div className="mx-auto max-w-[1400px]">
+
+
+
+          <div className="grid gap-12 border-b border-white/10 pb-12 md:grid-cols-[1fr_auto]">
+
+
+
+            {/* BRAND */}
+
+            <div>
+
+
+
+              <img
+
+                src="/assets/fobca-logo-source.png"
+
+                alt="FOBCA Limited"
+
+                className="h-14 w-auto object-contain brightness-0 invert"
+
+              />
+
+
+
+              <p className="mt-5 text-sm font-medium tracking-wide text-white/70">
+
+                FOBCA LIMITED
+
+                <span className="mx-2 text-white/25">
+
+                  |
+
+                </span>
+
+                RC No. 1816516
+
+              </p>
+
+
+
+              <p className="mt-2 text-sm font-medium tracking-wide text-white/70">
+
+                We realize your dreams.
+
+              </p>
+
+
+
+              <p className="mt-3 max-w-sm text-sm leading-7 text-white/45">
+
+                Premium Imported Furniture &amp; Home Solutions
+
+              </p>
+
+
+
+              <p className="mt-6 max-w-md text-[10px] uppercase leading-6 tracking-[0.13em] text-white/35">
+
+                Lagos, Nigeria
+
+                <span className="mx-2 text-white/20">
+
+                  ·
+
+                </span>
+
+                Online Furniture Business
+
+                <span className="mx-2 text-white/20">
+
+                  ·
+
+                </span>
+
+                Nationwide Delivery
+
+              </p>
+
+
+
+            </div>
+
+
+
+            {/* LINKS + CONTACT */}
+
+            <div className="grid grid-cols-2 gap-x-12 gap-y-10 sm:gap-x-20">
+
+
+
+              {/* EXPLORE */}
+
+              <div className="flex flex-col gap-4">
+
+
+
+                <span className="text-[9px] uppercase tracking-[0.2em] text-white/30">
+
+                  Explore
+
+                </span>
+
+
+
+                <button
+
+                  onClick={() => navigate("/furniture")}
+
+                  className="text-left text-sm text-white/60 transition hover:text-white"
+
+                >
+
+                  Furniture
+
+                </button>
+
+
+
+                <button
+
+                  onClick={() => navigate("/energy")}
+
+                  className="text-left text-sm text-white/60 transition hover:text-white"
+
+                >
+
+                  Oil &amp; Gas
+
+                </button>
+
+
+
+                <button
+
+                  onClick={() => navigate("/construction")}
+
+                  className="text-left text-sm text-white/60 transition hover:text-white"
+
+                >
+
+                  Construction
+
+                </button>
+
+
+
+                <button
+
+                  onClick={() => navigate("/architecture")}
+
+                  className="text-left text-sm text-white/60 transition hover:text-white"
+
+                >
+
+                  Architectural Design
+
+                </button>
+
+
+
+              </div>
+
+
+
+              {/* CONTACT */}
+
+              <div className="flex flex-col gap-4">
+
+
+
+                <span className="text-[9px] uppercase tracking-[0.2em] text-white/30">
+
+                  Contact
+
+                </span>
+
+
+
+                {/* PHONE */}
+
+                {storeSettings?.phone && (
+
+                  <a
+
+                    href={`tel:${storeSettings.phone}`}
+
+                    className="flex items-center gap-2 text-sm text-white/60 transition hover:text-white"
+
+                  >
+
+                    <span className="text-xs text-white/35">
+
+                      ☎
+
+                    </span>
+
+
+
+                    <span>
+
+                      {storeSettings.phone}
+
+                    </span>
+
+                  </a>
+
+                )}
+
+
+
+                {/* WHATSAPP */}
+
+                {storeSettings?.whatsapp && (
+
+                  <a
+
+                    href={`https://wa.me/${storeSettings.whatsapp.replace(
+
+                      /\D/g,
+
+                      "",
+
+                    )}`}
+
+                    target="_blank"
+
+                    rel="noreferrer"
+
+                    className="flex items-center gap-2 text-sm text-white/60 transition hover:text-white"
+
+                  >
+
+                    <span className="text-xs text-white/35">
+
+                      💬
+
+                    </span>
+
+
+
+                    <span>
+
+                      WhatsApp
+
+                    </span>
+
+                  </a>
+
+                )}
+
+
+
+                {/* EMAIL */}
+
+                {storeSettings?.email && (
+
+                  <a
+
+                    href={`mailto:${storeSettings.email}`}
+
+                    className="flex items-start gap-2 break-all text-sm text-white/60 transition hover:text-white"
+
+                  >
+
+                    <span className="mt-0.5 shrink-0 text-xs text-white/35">
+
+                      ✉
+
+                    </span>
+
+
+
+                    <span>
+
+                      {storeSettings.email}
+
+                    </span>
+
+                  </a>
+
+                )}
+
+
+
+                {/* SOCIAL MEDIA */}
+
+                <div className="mt-3">
+
+
+
+                  <span className="mb-3 block text-[9px] uppercase tracking-[0.2em] text-white/30">
+
+                    Follow Us
+
+                  </span>
+
+
+
+                  <div className="flex flex-wrap gap-2">
+
+
+
+                    {/* FACEBOOK */}
+
+                    {storeSettings?.facebook_url && (
+
+                      <a
+
+                        href={storeSettings.facebook_url}
+
+                        target="_blank"
+
+                        rel="noreferrer"
+
+                        aria-label="Facebook"
+
+                        title="Facebook"
+
+                        className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-white/55 transition-all duration-300 hover:border-white/50 hover:bg-white hover:text-[#0d2d20]"
+
+                      >
+
+                        <FacebookIcon />
+
+                      </a>
+
+                    )}
+
+
+
+                    {/* INSTAGRAM */}
+
+                    {storeSettings?.instagram_url && (
+
+                      <a
+
+                        href={storeSettings.instagram_url}
+
+                        target="_blank"
+
+                        rel="noreferrer"
+
+                        aria-label="Instagram"
+
+                        title="Instagram"
+
+                        className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-white/55 transition-all duration-300 hover:border-white/50 hover:bg-white hover:text-[#0d2d20]"
+
+                      >
+
+                        <InstagramIcon />
+
+                      </a>
+
+                    )}
+
+
+
+                    {/* YOUTUBE */}
+
+                    {storeSettings?.youtube_url && (
+
+                      <a
+
+                        href={storeSettings.youtube_url}
+
+                        target="_blank"
+
+                        rel="noreferrer"
+
+                        aria-label="YouTube"
+
+                        title="YouTube"
+
+                        className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-white/55 transition-all duration-300 hover:border-white/50 hover:bg-white hover:text-[#0d2d20]"
+
+                      >
+
+                        <YouTubeIcon />
+
+                      </a>
+
+                    )}
+
+
+
+                    {/* LINKEDIN */}
+
+                    {storeSettings?.linkedin_url && (
+
+                      <a
+
+                        href={storeSettings.linkedin_url}
+
+                        target="_blank"
+
+                        rel="noreferrer"
+
+                        aria-label="LinkedIn"
+
+                        title="LinkedIn"
+
+                        className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-white/55 transition-all duration-300 hover:border-white/50 hover:bg-white hover:text-[#0d2d20]"
+
+                      >
+
+                        <LinkedInIcon />
+
+                      </a>
+
+                    )}
+
+
+
+                    {/* X */}
+
+                    {storeSettings?.x_url && (
+
+                      <a
+
+                        href={storeSettings.x_url}
+
+                        target="_blank"
+
+                        rel="noreferrer"
+
+                        aria-label="X"
+
+                        title="X"
+
+                        className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-white/55 transition-all duration-300 hover:border-white/50 hover:bg-white hover:text-[#0d2d20]"
+
+                      >
+
+                        <XIcon />
+
+                      </a>
+
+                    )}
+
+
+
+                  </div>
+
+                </div>
+
+
+
+                {!storeSettings && (
+
+                  <span className="text-sm text-white/35">
+
+                    Loading contact details...
+
+                  </span>
+
+                )}
+
+
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+
+          {/* FOOTER BOTTOM */}
+
+          <div className="flex flex-col gap-3 pt-8 text-[9px] uppercase tracking-[0.2em] text-white/30 sm:flex-row sm:items-center sm:justify-between">
+
+
+
+            <span>
+
+              © {new Date().getFullYear()} Fobca Limited. All Rights Reserved.
+
+            </span>
+
+
+
+            <span>
+
+              We realize your dreams.
+
+            </span>
+
+
+
+            <button
+
+              onClick={() => navigate("/admin")}
+
+              className="text-left transition hover:text-white"
+
+            >
+
+              Admin
+
+            </button>
+
+
+
+          </div>
+
+        </div>
+
+      </footer>
+
+
+
+    </div>
+
+  );
+
 }
 /* =========================================================
    FURNITURE STORE
