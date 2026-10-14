@@ -13,6 +13,16 @@ type Department = {
   available?: boolean;
 };
 
+type StoreCollection = {
+  id: string;
+  name: string;
+  image: string;
+  description: string | null;
+  details: string | null;
+  display_order: number;
+  is_active: boolean;
+};
+
 type CustomerMessage = {
   id: string;
   name: string;
@@ -3463,6 +3473,111 @@ function HomePage() {
       </section>
 
 
+      {/* =====================================================
+
+          SCAMMER SECTION
+
+      ===================================================== */}
+
+   {/* SCAM ALERT & CUSTOMER PROTECTION NOTICE */}
+<section className="border-t border-red-200 bg-[#fffafa] px-6 py-16 sm:px-10 sm:py-20 lg:px-16">
+  <div className="mx-auto max-w-[1400px]">
+    <div className="max-w-4xl">
+      <div className="mb-3 flex items-center gap-3">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-700">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="m10.3 3.9-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3.1l-8-14a2 2 0 0 0-3.4 0Z" />
+            <path d="M12 9v4" />
+            <path d="M12 17h.01" />
+          </svg>
+        </span>
+
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-red-700">
+          Important Customer Notice
+        </p>
+      </div>
+
+      <h2 className="max-w-3xl font-serif text-3xl leading-tight tracking-tight text-red-700 sm:text-4xl lg:text-5xl">
+        Scam Alert & Customer Protection Notice
+      </h2>
+
+      <p className="mt-6 max-w-3xl text-sm leading-7 text-[#454545] sm:text-base sm:leading-8">
+        Fobca Limited hereby alerts all customers and the general public to
+        beware of fraudsters and impersonators who may falsely claim to
+        represent our company.
+      </p>
+
+      <p className="mt-8 text-sm font-semibold text-[#101b18] sm:text-base">
+        To protect yourself, please observe the following:
+      </p>
+
+      <div className="mt-5 space-y-5">
+        <div className="border-l-2 border-red-600 pl-4 sm:pl-5">
+          <h3 className="text-sm font-semibold text-[#101b18]">
+            Official website
+          </h3>
+          <a
+            href="https://www.fobcalimited.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-1 inline-block text-sm leading-6 text-[#454545] underline decoration-red-300 underline-offset-4 transition hover:text-red-700"
+          >
+            Visit www.fobcalimited.com
+          </a>
+        </div>
+
+        <div className="border-l-2 border-red-600 pl-4 sm:pl-5">
+          <h3 className="text-sm font-semibold text-[#101b18]">
+            Official contact
+          </h3>
+          <p className="mt-1 text-sm leading-6 text-[#454545]">
+            Call or WhatsApp{" "}
+            <a
+              href="https://wa.me/2348022839548"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-red-700 underline decoration-red-300 underline-offset-4 transition hover:text-red-800"
+            >
+              0802-283-9548
+            </a>{" "}
+            to verify orders and enquiries.
+          </p>
+        </div>
+
+        <div className="border-l-2 border-red-600 pl-4 sm:pl-5">
+          <h3 className="text-sm font-semibold text-[#101b18]">
+            Verify payments
+          </h3>
+          <p className="mt-1 text-sm leading-6 text-[#454545]">
+            Confirm all payment instructions and account details directly
+            with Fobca Limited through our official contact channel before
+            making payment.
+          </p>
+        </div>
+
+        <div className="border-l-2 border-red-600 pl-4 sm:pl-5">
+          <h3 className="text-sm font-semibold text-[#101b18]">
+            Beware of impersonators
+          </h3>
+          <p className="mt-1 text-sm leading-6 text-[#454545]">
+            Do not rely solely on social media profiles, screenshots,
+            payment receipts or messages claiming to be from Fobca Limited.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
       {/* =====================================================
 
@@ -3613,6 +3728,13 @@ function HomePage() {
                   Oil &amp; Gas
 
                 </button>
+
+               <button
+  onClick={() => navigate("/building-interior")}
+  className="text-left text-sm text-white/60 transition hover:text-white"
+>
+  Building & Interior
+</button>
 
 
 
@@ -4001,23 +4123,29 @@ function HomePage() {
   );
 
 }
+
 /* =========================================================
    FURNITURE STORE
 ========================================================= */
 
-import bedsImage from "./imports/beds.jpeg";
-import sofasImage from "./imports/sofas.jpeg";
-import diningImage from "./imports/dining.jpeg";
-import coffeeTablesImage from "./imports/coffee-tables.jpeg";
-import shoeRacksImage from "./imports/shoe-racks.jpeg";
-import rockingChairsImage from "./imports/rocking-chairs.jpeg";
-import bedsideLampsImage from "./imports/bedside-lamps.jpeg";
+
 
 function FurnitureStorePage() {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
+
   const [products, setProducts] = useState<Product[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
+
+  const [collections, setCollections] = useState<StoreCollection[]>([]);
+  const [loadingCollections, setLoadingCollections] = useState(true);
+  const [collectionsError, setCollectionsError] = useState<string | null>(
+    null,
+  );
+
+  /* =========================================================
+     INITIAL CATEGORY
+  ========================================================= */
 
   useEffect(() => {
     const category = new URLSearchParams(window.location.search).get(
@@ -4028,6 +4156,10 @@ function FurnitureStorePage() {
       setActiveCategory(category);
     }
   }, []);
+
+  /* =========================================================
+     LOAD PRODUCTS
+  ========================================================= */
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -4053,14 +4185,77 @@ function FurnitureStorePage() {
     loadProducts();
   }, []);
 
+ 
+/* =========================================================
+   LOAD COLLECTIONS FROM SUPABASE
+========================================================= */
+
+useEffect(() => {
+  const loadCollections = async () => {
+    setLoadingCollections(true);
+    setCollectionsError(null);
+
+    const { data, error } = await supabase
+      .from("collections")
+      .select(
+        "id, name, image, description, details, display_order, is_active",
+      )
+      .eq("is_active", true)
+      .order("display_order", { ascending: true });
+
+    if (error) {
+      console.error("Error loading collections:", error);
+
+      setCollections([]);
+      setCollectionsError(
+        "Collections could not be loaded. Please try again.",
+      );
+      setLoadingCollections(false);
+      return;
+    }
+
+    const loadedCollections: StoreCollection[] = (data ?? []).map(
+      (collection) => {
+        const imageUrl = collection.image?.startsWith("http")
+          ? collection.image
+          : supabase.storage
+              .from("collection-images")
+              .getPublicUrl(collection.image || "").data.publicUrl;
+
+        return {
+          id: collection.id,
+          name: collection.name,
+          image: imageUrl,
+          description: collection.description,
+          details: collection.details,
+          display_order: collection.display_order,
+          is_active: collection.is_active,
+        };
+      },
+    );
+
+    setCollections(loadedCollections);
+    setLoadingCollections(false);
+  };
+
+  loadCollections();
+}, []);
+
+  /* =========================================================
+     FILTER PRODUCTS
+  ========================================================= */
+
   const filteredProducts = products.filter((product) => {
+    const searchTerm = search.toLowerCase();
+
     const matchesSearch =
-      product.name.toLowerCase().includes(search.toLowerCase()) ||
-      product.description?.toLowerCase().includes(search.toLowerCase()) ||
-      product.category.toLowerCase().includes(search.toLowerCase());
+      product.name.toLowerCase().includes(searchTerm) ||
+      product.description?.toLowerCase().includes(searchTerm) ||
+      product.category.toLowerCase().includes(searchTerm);
 
     const matchesCategory =
-      activeCategory === "All" || product.category === activeCategory;
+      activeCategory === "All" ||
+      product.category === activeCategory;
 
     return matchesSearch && matchesCategory;
   });
@@ -4072,85 +4267,48 @@ function FurnitureStorePage() {
       : activeCategory;
 
   /* =========================================================
-     COLLECTIONS
+     COLLECTION CLICK
   ========================================================= */
 
-  const collections = [
-    {
-      name: "Beds",
-      image: bedsImage,
-      description: "Comfortable pieces for considered bedrooms.",
-      details: "",
-    },
-    {
-      name: "Sofas",
-      image: sofasImage,
-      description: "Refined seating for modern living spaces.",
-      details: "",
-    },
-    {
-      name: "Dining",
-      image: diningImage,
-      description: "Designed for everyday gathering and entertaining.",
-      details: "",
-    },
-    {
-      name: "Adjustable Coffee Tables",
-      image: coffeeTablesImage,
-      description: "Flexible forms designed around your space.",
-      details: "Walnut · Black · Oak · White",
-    },
-    {
-      name: "Premium Shoe Racks",
-      image: shoeRacksImage,
-      description: "Practical storage with a refined finish.",
-      details: "White Oak · Teak Wood",
-    },
-    {
-      name: "Rocking Chairs",
-      image: rockingChairsImage,
-      description: "Comfortable statement pieces in distinctive colours.",
-      details:
-        "Orange · Coffee · Brown · Off-white · Green · Dark Grey · Purple · Grey",
-    },
-    {
-      name: "Bedside Table Lamps",
-      image: bedsideLampsImage,
-      description: "Soft lighting with convenient modern controls.",
-      details: "Remote Control · Soft Touch",
-    },
-  ];
-
-  const handleCollectionClick = (category: string) => {
-    setActiveCategory(category);
-    setSearch("");
-
-    setTimeout(() => {
-      document
-        .getElementById("store-products")
-        ?.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-    }, 50);
+  
+const handleCollectionClick = (collectionName: string) => {
+  const categoryMap: Record<string, string> = {
+    Beds: "Bedroom",
+    Sofas: "Living Room",
+    Dining: "Dining",
+    "Adjustable Coffee Tables": "Living Room",
+    "Premium Shoe Racks": "Living Room",
+    "Rocking Chairs": "Living Room",
+    "Bedside Table Lamps": "Bedroom",
   };
+
+  const category = categoryMap[collectionName] ?? collectionName;
+
+  setActiveCategory(category);
+  setSearch("");
+
+  setTimeout(() => {
+    document.getElementById("store-products")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }, 50);
+};
+
 
   return (
     <>
       <Header store />
 
       <main className="bg-[#fbfaf6]">
-
         {/* =====================================================
             STORE HERO
         ===================================================== */}
 
         <section className="relative overflow-hidden bg-[#ded8ca]">
-
           {/* MOBILE — FULL IMAGE */}
 
           <div className="relative block sm:hidden">
-
             <img
               src={fobcaBanner}
               alt="FOBCA Furniture"
@@ -4162,26 +4320,19 @@ function FurnitureStorePage() {
             <div className="absolute inset-0 z-10 flex items-center">
               <div className="mx-auto w-full px-5">
                 <div className="max-w-[320px] text-white">
-
-                 
                   <h1 className="mt-6 font-['Playfair_Display'] text-[clamp(2.5rem,10vw,4rem)] font-normal leading-[0.9] tracking-[-0.05em]">
                     Furniture <br /> for
                     <br />
                     beautiful spaces.
                   </h1>
-
-                  
-
                 </div>
               </div>
             </div>
-
           </div>
 
           {/* DESKTOP */}
 
           <div className="relative hidden min-h-[560px] sm:block sm:min-h-[620px]">
-
             <img
               src={fobcaBanner}
               alt="FOBCA Furniture"
@@ -4191,11 +4342,8 @@ function FurnitureStorePage() {
             <div className="absolute inset-0 bg-black/25" />
 
             <div className="relative z-10 flex min-h-[560px] items-center sm:min-h-[620px]">
-
               <div className="mx-auto w-full max-w-[1400px] px-10 lg:px-20 xl:px-28">
-
                 <div className="max-w-[420px] text-white">
-
                   <p className="text-[10px] uppercase tracking-[0.22em] text-white/70">
                     FOBCA Furniture
                   </p>
@@ -4210,30 +4358,21 @@ function FurnitureStorePage() {
                     Discover carefully selected furniture designed to bring
                     comfort, function and character into your space.
                   </p>
-
                 </div>
-
               </div>
-
             </div>
-
           </div>
-
         </section>
-
 
         {/* =====================================================
             STORE CONTROLS
         ===================================================== */}
 
         <section className="mx-auto max-w-[1400px] px-5 py-16 sm:px-10 lg:px-20 xl:px-28">
-
           {/* SEARCH */}
 
           <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-
             <div className="flex w-full max-w-md items-center gap-3 border-b border-black/20 py-3">
-
               <SearchIcon />
 
               <input
@@ -4244,22 +4383,16 @@ function FurnitureStorePage() {
                 aria-label="Search furniture"
                 className="w-full bg-transparent text-sm outline-none placeholder:text-black/35"
               />
-
             </div>
-
           </div>
-
 
           {/* =====================================================
               OUR COLLECTIONS
           ===================================================== */}
 
           <section className="mt-20">
-
             <div className="flex flex-col justify-between gap-6 border-b border-black/10 pb-6 sm:flex-row sm:items-end">
-
               <div>
-
                 <p className="text-[10px] uppercase tracking-[0.25em] text-[#174b32]">
                   Explore
                 </p>
@@ -4267,93 +4400,112 @@ function FurnitureStorePage() {
                 <h2 className="mt-3 font-['Playfair_Display'] text-4xl font-normal leading-none tracking-[-0.03em] sm:text-5xl">
                   Our Collections
                 </h2>
-
               </div>
 
               <p className="max-w-sm text-xs leading-6 text-black/45 sm:text-sm">
                 Explore carefully selected furniture pieces for every
                 part of your space.
               </p>
-
             </div>
-
 
             {/* COLLECTION GRID */}
 
-            <div className="mt-10 grid grid-cols-2 gap-x-3 gap-y-12 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
-
-              {collections.map((collection, index) => (
+            {loadingCollections ? (
+              <div className="mt-10 grid grid-cols-2 gap-x-3 gap-y-12 sm:gap-6 lg:grid-cols-3">
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <div key={index} className="animate-pulse">
+                    <div className="aspect-[0.86] bg-[#e8e3d8]" />
+                    <div className="mt-4 h-5 w-3/4 bg-[#e8e3d8]" />
+                    <div className="mt-3 h-3 w-full bg-[#e8e3d8]" />
+                  </div>
+                ))}
+              </div>
+            ) : collectionsError ? (
+              <div className="mt-10 border border-black/10 px-5 py-12 text-center">
+                <p className="text-sm text-black/55">
+                  {collectionsError}
+                </p>
 
                 <button
-                  key={collection.name}
-                  onClick={() => handleCollectionClick(collection.name)}
-                  className="group text-left"
+                  type="button"
+                  onClick={() => window.location.reload()}
+                  className="mt-4 text-xs uppercase tracking-[0.15em] text-[#174b32] underline underline-offset-4"
                 >
-
-                  {/* IMAGE */}
-
-                  <div className="relative aspect-[0.86] overflow-hidden bg-[#e8e3d8]">
-
-                    <img
-                      src={collection.image}
-                      alt={collection.name}
-                      className="h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.035]"
-                    />
-
-                    {/* NUMBER */}
-
-                    <span className="absolute left-3 top-3 font-mono text-[8px] tracking-[0.15em] text-white/80 sm:left-4 sm:top-4">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-
-                    {/* ARROW */}
-
-                    <span className="absolute bottom-3 right-3 flex h-8 w-8 items-center justify-center border border-white/50 bg-black/10 text-sm text-white opacity-0 backdrop-blur-sm transition-all duration-300 group-hover:opacity-100 sm:bottom-4 sm:right-4">
-                      ↗
-                    </span>
-
-                  </div>
-
-
-                  {/* TEXT */}
-
-                  <div className="pt-4">
-
-                    <h3 className="font-['Playfair_Display'] text-lg leading-[1.05] tracking-[-0.02em] text-[#101b18] sm:text-xl">
-                      {collection.name}
-                    </h3>
-
-                    {collection.description && (
-                      <p className="mt-2 max-w-sm text-[10px] leading-5 text-black/45 sm:text-xs sm:leading-6">
-                        {collection.description}
-                      </p>
-                    )}
-
-                    {collection.details && (
-                      <p className="mt-2 text-[8px] uppercase leading-4 tracking-[0.12em] text-[#174b32]/70 sm:text-[9px]">
-                        {collection.details}
-                      </p>
-                    )}
-
-                  </div>
-
+                  Try again
                 </button>
+              </div>
+            ) : collections.length === 0 ? (
+              <div className="mt-10 py-16 text-center">
+                <p className="font-['Playfair_Display'] text-2xl text-[#101b18]">
+                  Collections coming soon.
+                </p>
+              </div>
+            ) : (
+              <div className="mt-10 grid grid-cols-2 gap-x-3 gap-y-12 sm:gap-6 lg:grid-cols-3">
+                {collections.map((collection, index) => (
+                  <button
+                    key={collection.id}
+                    type="button"
+                    onClick={() => handleCollectionClick(collection.name)}
+                    className="group text-left"
+                  >
+                    {/* IMAGE */}
 
-              ))}
+                    <div className="relative aspect-[0.86] overflow-hidden bg-[#e8e3d8]">
+                      <img
+                        src={collection.image}
+                        alt={collection.name}
+                        loading="lazy"
+                        className="h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.035]"
+                      />
 
-            </div>
+                      {/* NUMBER */}
 
+                      <span className="absolute left-3 top-3 font-mono text-[8px] tracking-[0.15em] text-white/80 sm:left-4 sm:top-4">
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+
+                      {/* ARROW */}
+
+                      <span className="absolute bottom-3 right-3 flex h-8 w-8 items-center justify-center border border-white/50 bg-black/10 text-sm text-white opacity-0 backdrop-blur-sm transition-all duration-300 group-hover:opacity-100 sm:bottom-4 sm:right-4">
+                        ↗
+                      </span>
+                    </div>
+
+                    {/* TEXT */}
+
+                    <div className="pt-4">
+                      <h3 className="font-['Playfair_Display'] text-lg leading-[1.05] tracking-[-0.02em] text-[#101b18] sm:text-xl">
+                        {collection.name}
+                      </h3>
+
+                      {collection.description && (
+                        <p className="mt-2 max-w-sm text-[10px] leading-5 text-black/45 sm:text-xs sm:leading-6">
+                          {collection.description}
+                        </p>
+                      )}
+
+                      {collection.details && (
+                        <p className="mt-2 text-[8px] uppercase leading-4 tracking-[0.12em] text-[#174b32]/70 sm:text-[9px]">
+                          {collection.details}
+                        </p>
+                      )}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
           </section>
 
-
           {/* =====================================================
-              SECTION HEADING
+              STORE SECTION HEADING
           ===================================================== */}
 
-          <div className="mt-24 flex items-end justify-between border-b border-black/10 pb-5">
-
+          <div
+            id="store-products"
+            className="mt-24 flex items-end justify-between border-b border-black/10 pb-5"
+          >
             <div>
-
               <p className="text-[10px] uppercase tracking-[0.18em] text-[#174b32]">
                 Shop
               </p>
@@ -4361,34 +4513,25 @@ function FurnitureStorePage() {
               <h2 className="mt-2 font-['Playfair_Display'] text-3xl font-normal tracking-[-0.02em] sm:text-4xl">
                 {filteredTitle}
               </h2>
-
             </div>
 
             <span className="hidden text-[10px] uppercase tracking-[0.12em] text-black/35 sm:block">
-              {products.length} products
+              {filteredProducts.length} products
             </span>
-
           </div>
-
 
           {/* =====================================================
               PRODUCTS
           ===================================================== */}
 
           {loadingProducts ? (
-
             <div className="mt-12 py-20 text-center">
-
               <p className="text-[9px] uppercase tracking-[0.22em] text-black/40">
-                Loading collection...
+                Loading products...
               </p>
-
             </div>
-
           ) : filteredProducts.length === 0 ? (
-
             <div className="mt-12 border-t border-black/10 py-20 text-center">
-
               <p className="font-['Playfair_Display'] text-2xl">
                 No furniture found.
               </p>
@@ -4396,44 +4539,25 @@ function FurnitureStorePage() {
               <p className="mt-3 text-sm text-black/40">
                 Try another search or category.
               </p>
-
             </div>
-
           ) : (
-
-            <div
-              id="store-products"
-              className="mt-8 grid grid-cols-2 gap-x-3 gap-y-10 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3"
-            >
-
+            <div className="mt-8 grid grid-cols-2 gap-x-3 gap-y-10 sm:gap-5 lg:grid-cols-3">
               {filteredProducts.map((product) => (
-
-                <article
-                  key={product.id}
-                  className="group"
-                >
-
+                <article key={product.id} className="group">
                   <div className="relative aspect-[0.86] overflow-hidden bg-[#e8e3d8]">
-
                     {product.image_url ? (
-
                       <img
                         src={product.image_url}
                         alt={product.name}
+                        loading="lazy"
                         className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.02]"
                       />
-
                     ) : (
-
                       <ImagePlaceholder label="No image" />
-
                     )}
-
                   </div>
 
-
                   <div className="pt-2">
-
                     <p className="mb-1 text-[8px] uppercase tracking-[0.15em] text-[#174b32]">
                       {product.category}
                     </p>
@@ -4447,12 +4571,12 @@ function FurnitureStorePage() {
                     </p>
 
                     <button
+                      type="button"
                       onClick={() => {
                         // Cart functionality comes next.
                       }}
                       className="group mt-4 flex items-center gap-2 text-[#174b32]"
                     >
-
                       <span className="text-[8px] uppercase tracking-[0.2em]">
                         Buy this piece
                       </span>
@@ -4460,27 +4584,20 @@ function FurnitureStorePage() {
                       <span className="text-sm transition-transform duration-300 group-hover:translate-x-1">
                         →
                       </span>
-
                     </button>
-
                   </div>
-
                 </article>
-
               ))}
-
             </div>
-
           )}
-
         </section>
-
       </main>
 
       <Footer />
     </>
   );
 }
+
 
 /* =========================================================
    COMING SOON
@@ -4541,25 +4658,44 @@ function ComingSoonPage({
    ADMIN LOGIN
 ========================================================= */
 
+
+
 function AdminLoginPage() {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loggingIn, setLoggingIn] = useState(false);
+  const [loginError, setLoginError] = useState("");
 
-  const ADMIN_USERNAME = "fobcaadmin";
-  const ADMIN_PASSWORD = "Fobca@admin";
-
-  const handleLogin = (event: React.FormEvent) => {
+  const handleLogin = async (
+    event: React.FormEvent<HTMLFormElement>,
+  ) => {
     event.preventDefault();
+    setLoggingIn(true);
+    setLoginError("");
 
-    if (
-      username === ADMIN_USERNAME &&
-      password === ADMIN_PASSWORD
-    ) {
+    try {
+      const { data, error } = await supabase.rpc(
+        "verify_admin_login",
+        {
+          p_email: email.trim(),
+          p_password: password,
+        },
+      );
+
+      if (error) throw error;
+
+      if (data !== true) {
+        setLoginError("Invalid email or password.");
+        return;
+      }
+
       navigate("/admin/dashboard");
-      return;
+    } catch (error) {
+      console.error("Admin login failed:", error);
+      setLoginError("Unable to sign in. Please try again.");
+    } finally {
+      setLoggingIn(false);
     }
-
-    alert("Invalid username or password.");
   };
 
   return (
@@ -4570,11 +4706,9 @@ function AdminLoginPage() {
             <p className="text-[10px] uppercase tracking-[0.28em] text-white/40">
               FOBCA Limited
             </p>
-
             <h1 className="mt-4 font-['Playfair_Display'] text-5xl font-normal tracking-[-0.04em]">
               Admin
             </h1>
-
             <p className="mt-4 max-w-sm text-sm leading-6 text-white/50">
               Sign in to manage products and store information.
             </p>
@@ -4583,19 +4717,19 @@ function AdminLoginPage() {
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
               <label
-                htmlFor="admin-username"
+                htmlFor="admin-email"
                 className="mb-2 block text-[9px] uppercase tracking-[0.2em] text-white/50"
               >
-                Username
+                Login Email
               </label>
-
               <input
-                id="admin-username"
-                type="text"
-                value={username}
-                onChange={(event) => setUsername(event.target.value)}
-                className="w-full border-b border-white/20 bg-transparent px-0 py-3 text-sm outline-none transition focus:border-white"
+                id="admin-email"
+                type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                required
                 autoComplete="username"
+                className="w-full border-b border-white/20 bg-transparent px-0 py-3 text-sm outline-none transition focus:border-white"
               />
             </div>
 
@@ -4606,25 +4740,31 @@ function AdminLoginPage() {
               >
                 Password
               </label>
-
               <input
                 id="admin-password"
                 type="password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
-                className="w-full border-b border-white/20 bg-transparent px-0 py-3 text-sm outline-none transition focus:border-white"
+                required
                 autoComplete="current-password"
+                className="w-full border-b border-white/20 bg-transparent px-0 py-3 text-sm outline-none transition focus:border-white"
               />
             </div>
 
+            {loginError && (
+              <p className="text-sm text-red-300" role="alert">
+                {loginError}
+              </p>
+            )}
+
             <button
               type="submit"
-              className="mt-4 flex w-full items-center justify-between border border-white/20 px-5 py-4 text-left transition hover:border-white hover:bg-white hover:text-[#101b18]"
+              disabled={loggingIn}
+              className="mt-4 flex w-full items-center justify-between border border-white/20 px-5 py-4 text-left transition hover:border-white hover:bg-white hover:text-[#101b18] disabled:cursor-not-allowed disabled:opacity-50"
             >
               <span className="text-[9px] uppercase tracking-[0.2em]">
-                Sign in
+                {loggingIn ? "Checking..." : "Sign in"}
               </span>
-
               <span>→</span>
             </button>
           </form>
@@ -4634,47 +4774,49 @@ function AdminLoginPage() {
   );
 }
 
+
+
 /* =========================================================
    ADMIN DASHBOARD
 ========================================================= */
 
+
 function AdminDashboardPage() {
-  const [productCount, setProductCount] = useState(0);
-  const [messageCount, setMessageCount] = useState(0);
+ 
+const [productCount, setProductCount] = useState(0);
+const [messageCount, setMessageCount] = useState(0);
 
-  useEffect(() => {
-    const loadDashboardCounts = async () => {
-      const { count: products, error: productError } = await supabase
-        .from("products")
-        .select("*", { count: "exact", head: true });
+useEffect(() => {
+  const loadDashboardCounts = async () => {
+    const { count: products, error: productError } = await supabase
+      .from("products")
+      .select("*", { count: "exact", head: true });
 
-      if (productError) {
-        console.error("Error loading product count:", productError);
-      } else {
-        setProductCount(products ?? 0);
-      }
+    if (productError) {
+      console.error("Error loading product count:", productError);
+    } else {
+      setProductCount(products ?? 0);
+    }
 
-      const { count: messages, error: messageError } = await supabase
-        .from("customer_messages")
-        .select("*", { count: "exact", head: true })
-        .eq("is_read", false);
+    const { count: messages, error: messageError } = await supabase
+      .from("customer_messages")
+      .select("*", { count: "exact", head: true });
 
-      if (messageError) {
-        console.error(
-          "Error loading customer message count:",
-          messageError
-        );
-      } else {
-        setMessageCount(messages ?? 0);
-      }
-    };
+    if (messageError) {
+      console.error("Error loading customer message count:", messageError);
+    } else {
+      setMessageCount(messages ?? 0);
+    }
+  };
 
-    loadDashboardCounts();
-  }, []);
+  loadDashboardCounts();
+}, []);
+
 
   return (
     <main className="min-h-screen bg-[#f3f0e8] text-[#101b18]">
-      <header className="border-b border-[#101b18]/10 bg-[#101b18] px-6 py-5 text-white sm:px-10">
+      {/* HEADER */}
+      <header className="border-b border-white/10 bg-[#101b18] px-6 py-5 text-white sm:px-10">
         <div className="mx-auto flex max-w-[1400px] items-center justify-between">
           <div>
             <p className="text-[9px] uppercase tracking-[0.28em] text-white/40">
@@ -4696,7 +4838,9 @@ function AdminDashboardPage() {
       </header>
 
       <div className="mx-auto max-w-[1400px] px-6 py-10 sm:px-10 lg:px-16 lg:py-14">
-        <div className="grid gap-5 md:grid-cols-3">
+        {/* MANAGEMENT CARDS */}
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+
           {/* PRODUCTS */}
           <button
             onClick={() => navigate("/admin/products")}
@@ -4710,12 +4854,35 @@ function AdminDashboardPage() {
               Products
             </h2>
 
-            <p className="mt-3 max-w-sm text-sm leading-6 text-[#101b18]/50">
+            <p className="mt-3 text-sm leading-6 text-[#101b18]/50">
               Add, edit and remove furniture products from the online store.
             </p>
 
             <span className="mt-7 block text-[9px] uppercase tracking-[0.2em] text-[#174b32] transition-transform duration-300 group-hover:translate-x-1">
               Manage products →
+            </span>
+          </button>
+
+          {/* COLLECTIONS */}
+          <button
+            onClick={() => navigate("/admin/collections")}
+            className="group border border-[#101b18]/10 bg-white p-7 text-left transition duration-300 hover:-translate-y-0.5 hover:border-[#174b32] hover:shadow-[0_12px_35px_rgba(16,27,24,0.06)]"
+          >
+            <p className="text-[9px] uppercase tracking-[0.22em] text-[#101b18]/40">
+              Furniture Categories
+            </p>
+
+            <h2 className="mt-3 font-['Playfair_Display'] text-3xl">
+              Collections
+            </h2>
+
+            <p className="mt-3 text-sm leading-6 text-[#101b18]/50">
+              Add, edit and remove furniture collections, images and
+              descriptions.
+            </p>
+
+            <span className="mt-7 block text-[9px] uppercase tracking-[0.2em] text-[#174b32] transition-transform duration-300 group-hover:translate-x-1">
+              Manage collections →
             </span>
           </button>
 
@@ -4732,7 +4899,7 @@ function AdminDashboardPage() {
               Store Details
             </h2>
 
-            <p className="mt-3 max-w-sm text-sm leading-6 text-[#101b18]/50">
+            <p className="mt-3 text-sm leading-6 text-[#101b18]/50">
               Manage FOBCA&apos;s phone number, WhatsApp, address, email and
               social links.
             </p>
@@ -4765,7 +4932,7 @@ function AdminDashboardPage() {
               )}
             </div>
 
-            <p className="mt-3 max-w-sm text-sm leading-6 text-[#101b18]/50">
+            <p className="mt-3 text-sm leading-6 text-[#101b18]/50">
               View customer enquiries, feedback, order support and other
               messages received through the website.
             </p>
@@ -4776,12 +4943,14 @@ function AdminDashboardPage() {
           </button>
         </div>
 
+        {/* QUICK OVERVIEW */}
         <div className="mt-10 border-t border-[#101b18]/10 pt-8">
           <p className="text-[9px] uppercase tracking-[0.22em] text-[#101b18]/35">
             Quick overview
           </p>
 
           <div className="mt-5 grid gap-4 sm:grid-cols-3">
+            {/* PRODUCT COUNT */}
             <div className="bg-white p-6">
               <p className="text-[9px] uppercase tracking-[0.18em] text-[#101b18]/35">
                 Products
@@ -4792,6 +4961,7 @@ function AdminDashboardPage() {
               </p>
             </div>
 
+            {/* UNREAD MESSAGES */}
             <div className="bg-white p-6">
               <p className="text-[9px] uppercase tracking-[0.18em] text-[#101b18]/35">
                 Unread Messages
@@ -4802,6 +4972,7 @@ function AdminDashboardPage() {
               </p>
             </div>
 
+            {/* STORE STATUS */}
             <div className="bg-white p-6">
               <p className="text-[9px] uppercase tracking-[0.18em] text-[#101b18]/35">
                 Store
@@ -4818,25 +4989,34 @@ function AdminDashboardPage() {
   );
 }
 
+
+
 function AdminMessagesPage() {
   const [messages, setMessages] = useState<CustomerMessage[]>([]);
-const [loading, setLoading] = useState(true);
-const [selectedMessage, setSelectedMessage] =
-  useState<CustomerMessage | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [selectedMessage, setSelectedMessage] =
+    useState<CustomerMessage | null>(null);
 
   const loadMessages = async () => {
     setLoading(true);
 
     const { data, error } = await supabase
       .from("customer_messages")
-      .select("*")
+      .select("id, name, email, phone, message, created_at")
       .order("created_at", { ascending: false });
 
     if (error) {
-      console.error("Error loading customer messages:", error);
+      console.error("Error loading messages:", error.message);
       setMessages([]);
     } else {
-      setMessages(data ?? []);
+      const loadedMessages = (data ?? []) as CustomerMessage[];
+      setMessages(loadedMessages);
+
+      setSelectedMessage((current) =>
+        current
+          ? loadedMessages.find((message) => message.id === current.id) ?? null
+          : null
+      );
     }
 
     setLoading(false);
@@ -4846,48 +5026,8 @@ const [selectedMessage, setSelectedMessage] =
     loadMessages();
   }, []);
 
-  const markAsRead = async (id: string) => {
-    const { error } = await supabase
-      .from("customer_messages")
-      .update({ is_read: true })
-      .eq("id", id);
-
-    if (error) {
-      console.error("Error marking message as read:", error);
-      return;
-    }
-
-    setMessages((current) =>
-      current.map((message) =>
-        message.id === id ? { ...message, is_read: true } : message
-      )
-    );
-
-    setSelectedMessage((current) =>
-      current?.id === id ? { ...current, is_read: true } : current
-    );
-  };
-
-  const markAsUnread = async (id: string) => {
-    const { error } = await supabase
-      .from("customer_messages")
-      .update({ is_read: false })
-      .eq("id", id);
-
-    if (error) {
-      console.error("Error marking message as unread:", error);
-      return;
-    }
-
-    setMessages((current) =>
-      current.map((message) =>
-        message.id === id ? { ...message, is_read: false } : message
-      )
-    );
-
-    setSelectedMessage((current) =>
-      current?.id === id ? { ...current, is_read: false } : current
-    );
+  const openMessage = (message: CustomerMessage) => {
+    setSelectedMessage(message);
   };
 
   const deleteMessage = async (id: string) => {
@@ -4903,7 +5043,8 @@ const [selectedMessage, setSelectedMessage] =
       .eq("id", id);
 
     if (error) {
-      console.error("Error deleting customer message:", error);
+      console.error("Error deleting message:", error.message);
+      window.alert("Could not delete this message. Please try again.");
       return;
     }
 
@@ -4916,34 +5057,23 @@ const [selectedMessage, setSelectedMessage] =
     );
   };
 
- const openMessage = async (message: CustomerMessage) => {
-    setSelectedMessage(message);
-
-    if (!message.is_read) {
-      await markAsRead(message.id);
-    }
-  };
-
-  const formatDate = (date: string) => {
-    return new Date(date).toLocaleString("en-NG", {
+  const formatDate = (date: string) =>
+    new Date(date).toLocaleString("en-NG", {
       day: "numeric",
       month: "short",
       year: "numeric",
       hour: "numeric",
       minute: "2-digit",
     });
-  };
 
   return (
     <main className="min-h-screen bg-[#f3f0e8] text-[#101b18]">
-      {/* HEADER */}
-      <header className="border-b border-[#101b18]/10 bg-[#101b18] px-6 py-5 text-white sm:px-10">
+      <header className="border-b border-white/10 bg-[#101b18] px-6 py-5 text-white sm:px-10">
         <div className="mx-auto flex max-w-[1400px] items-center justify-between">
           <div>
             <p className="text-[9px] uppercase tracking-[0.28em] text-white/40">
               FOBCA Limited
             </p>
-
             <h1 className="mt-1 font-['Playfair_Display'] text-2xl">
               Customer Messages
             </h1>
@@ -4959,7 +5089,6 @@ const [selectedMessage, setSelectedMessage] =
       </header>
 
       <div className="mx-auto max-w-[1400px] px-6 py-10 sm:px-10 lg:px-16 lg:py-14">
-        {/* PAGE INTRO */}
         <div className="mb-10 flex flex-col justify-between gap-6 border-b border-[#101b18]/10 pb-8 sm:flex-row sm:items-end">
           <div>
             <p className="text-[9px] uppercase tracking-[0.22em] text-[#101b18]/40">
@@ -4974,17 +5103,21 @@ const [selectedMessage, setSelectedMessage] =
               Read and manage enquiries, feedback and messages submitted
               through the FOBCA website.
             </p>
+
+            <p className="mt-3 text-xs text-[#101b18]/50">
+              {messages.length} message{messages.length === 1 ? "" : "s"}
+            </p>
           </div>
 
           <button
             onClick={loadMessages}
-            className="border border-[#101b18]/15 px-5 py-3 text-[9px] uppercase tracking-[0.2em] transition hover:border-[#174b32] hover:text-[#174b32]"
+            disabled={loading}
+            className="border border-[#101b18]/15 px-5 py-3 text-[9px] uppercase tracking-[0.2em] transition hover:border-[#174b32] hover:text-[#174b32] disabled:opacity-50"
           >
-            Refresh Messages
+            {loading ? "Loading..." : "Refresh Messages"}
           </button>
         </div>
 
-        {/* MESSAGE LIST */}
         {loading ? (
           <div className="border border-[#101b18]/10 bg-white p-10 text-center">
             <p className="text-xs uppercase tracking-[0.2em] text-[#101b18]/40">
@@ -4998,110 +5131,78 @@ const [selectedMessage, setSelectedMessage] =
             </p>
 
             <h3 className="mt-4 font-['Playfair_Display'] text-3xl">
-              No messages yet
+              No messages found
             </h3>
 
             <p className="mx-auto mt-3 max-w-md text-sm leading-7 text-[#101b18]/45">
-              Customer enquiries and feedback submitted through the website
-              will appear here.
+              No messages were returned by Supabase. Click Refresh Messages
+              to try again.
             </p>
           </div>
         ) : (
           <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
-            {/* INBOX LIST */}
             <div className="border-y border-[#101b18]/10">
               {messages.map((message) => (
                 <button
                   key={message.id}
                   onClick={() => openMessage(message)}
-                  className={`group flex w-full border-b border-[#101b18]/10 p-5 text-left transition last:border-b-0 hover:bg-white ${
+                  className={`block w-full border-b border-[#101b18]/10 p-5 text-left transition last:border-b-0 hover:bg-white ${
                     selectedMessage?.id === message.id
                       ? "bg-white"
                       : "bg-transparent"
                   }`}
                 >
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex min-w-0 items-center gap-3">
-                        {!message.is_read && (
-                          <span className="h-2 w-2 shrink-0 rounded-full bg-[#174b32]" />
-                        )}
-
-                        <p
-                          className={`truncate text-sm ${
-                            message.is_read
-                              ? "font-normal text-[#101b18]/70"
-                              : "font-medium text-[#101b18]"
-                          }`}
-                        >
-                          {message.name}
-                        </p>
-                      </div>
-
-                      <span className="shrink-0 text-[9px] uppercase tracking-[0.08em] text-[#101b18]/35">
-                        {formatDate(message.created_at)}
-                      </span>
-                    </div>
-
-                    <p className="mt-2 text-[9px] uppercase tracking-[0.15em] text-[#174b32]/70">
-                      {message.type}
+                  <div className="flex items-start justify-between gap-4">
+                    <p className="truncate text-sm font-medium">
+                      {message.name}
                     </p>
 
-                    <p className="mt-2 truncate text-xs leading-6 text-[#101b18]/45">
-                      {message.message}
-                    </p>
+                    <span className="shrink-0 text-[9px] text-[#101b18]/40">
+                      {formatDate(message.created_at)}
+                    </span>
                   </div>
+
+                  <p className="mt-2 truncate text-xs text-[#101b18]/45">
+                    {message.email}
+                  </p>
+
+                  <p className="mt-2 line-clamp-2 text-xs leading-6 text-[#101b18]/60">
+                    {message.message}
+                  </p>
                 </button>
               ))}
             </div>
 
-            {/* MESSAGE DETAIL */}
-            <div className="min-h-[500px] border border-[#101b18]/10 bg-white">
+            <div className="min-h-[400px] border border-[#101b18]/10 bg-white">
               {!selectedMessage ? (
-                <div className="flex min-h-[500px] items-center justify-center px-8 text-center">
-                  <div>
-                    <p className="text-[9px] uppercase tracking-[0.25em] text-[#101b18]/30">
-                      Select a message
-                    </p>
+                
+<div className="flex min-h-[400px] items-center justify-center px-8 text-center">
+  <p className="text-sm leading-7 text-[#101b18]/45">
+    <span className="hidden lg:inline">
+      Click any message on the left to read the full message.
+    </span>
+    <span className="lg:hidden">
+      Click any message above to read the full message.
+    </span>
+  </p>
+</div>
 
-                    <p className="mt-4 max-w-sm text-sm leading-7 text-[#101b18]/45">
-                      Select a customer message from the inbox to read the
-                      full enquiry.
-                    </p>
-                  </div>
-                </div>
               ) : (
-                <div>
-                  {/* MESSAGE HEADER */}
+                <>
                   <div className="border-b border-[#101b18]/10 p-7 sm:p-9">
-                    <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-start">
-                      <div>
-                        <p className="text-[9px] uppercase tracking-[0.2em] text-[#174b32]/70">
-                          {selectedMessage.type}
-                        </p>
+                    <p className="text-[9px] uppercase tracking-[0.2em] text-[#174b32]/70">
+                      Customer Message
+                    </p>
 
-                        <h3 className="mt-3 font-['Playfair_Display'] text-3xl">
-                          {selectedMessage.name}
-                        </h3>
+                    <h3 className="mt-3 break-words font-['Playfair_Display'] text-3xl">
+                      {selectedMessage.name}
+                    </h3>
 
-                        <p className="mt-2 text-xs text-[#101b18]/40">
-                          {formatDate(selectedMessage.created_at)}
-                        </p>
-                      </div>
-
-                      <span
-                        className={`inline-flex w-fit px-3 py-2 text-[9px] uppercase tracking-[0.15em] ${
-                          selectedMessage.is_read
-                            ? "bg-[#101b18]/5 text-[#101b18]/40"
-                            : "bg-[#174b32] text-white"
-                        }`}
-                      >
-                        {selectedMessage.is_read ? "Read" : "Unread"}
-                      </span>
-                    </div>
+                    <p className="mt-2 text-xs text-[#101b18]/40">
+                      {formatDate(selectedMessage.created_at)}
+                    </p>
                   </div>
 
-                  {/* CUSTOMER DETAILS */}
                   <div className="grid gap-px border-b border-[#101b18]/10 bg-[#101b18]/10 sm:grid-cols-2">
                     <div className="bg-white p-6">
                       <p className="text-[9px] uppercase tracking-[0.18em] text-[#101b18]/35">
@@ -5136,80 +5237,41 @@ const [selectedMessage, setSelectedMessage] =
                     </div>
                   </div>
 
-                  {/* RATING */}
-                  {selectedMessage.rating && (
-                    <div className="border-b border-[#101b18]/10 p-7 sm:p-9">
-                      <p className="text-[9px] uppercase tracking-[0.18em] text-[#101b18]/35">
-                        Customer Rating
-                      </p>
-
-                      <p className="mt-3 font-['Playfair_Display'] text-2xl">
-                        {selectedMessage.rating}/5
-                      </p>
-                    </div>
-                  )}
-
-                  {/* MESSAGE */}
                   <div className="p-7 sm:p-9">
                     <p className="text-[9px] uppercase tracking-[0.18em] text-[#101b18]/35">
                       Message
                     </p>
 
-                    <p className="mt-5 whitespace-pre-wrap text-sm leading-8 text-[#101b18]/70">
+                    <p className="mt-5 whitespace-pre-wrap break-words text-sm leading-8 text-[#101b18]/70">
                       {selectedMessage.message}
                     </p>
                   </div>
 
-                  {/* ACTIONS */}
-                  <div className="flex flex-col gap-3 border-t border-[#101b18]/10 p-7 sm:flex-row sm:items-center sm:justify-between sm:p-9">
-                    <div className="flex flex-wrap gap-3">
-                      {selectedMessage.is_read ? (
-                        <button
-                          onClick={() =>
-                            markAsUnread(selectedMessage.id)
-                          }
-                          className="border border-[#101b18]/15 px-4 py-3 text-[9px] uppercase tracking-[0.16em] transition hover:border-[#174b32] hover:text-[#174b32]"
-                        >
-                          Mark Unread
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() =>
-                            markAsRead(selectedMessage.id)
-                          }
-                          className="bg-[#174b32] px-4 py-3 text-[9px] uppercase tracking-[0.16em] text-white transition hover:bg-[#101b18]"
-                        >
-                          Mark Read
-                        </button>
-                      )}
+                  <div className="flex flex-wrap gap-3 border-t border-[#101b18]/10 p-7 sm:p-9">
+                    <a
+                      href={`mailto:${selectedMessage.email}`}
+                      className="border border-[#101b18]/15 px-4 py-3 text-[9px] uppercase tracking-[0.16em] transition hover:border-[#174b32] hover:text-[#174b32]"
+                    >
+                      Reply by Email
+                    </a>
 
+                    {selectedMessage.phone && (
                       <a
-                        href={`mailto:${selectedMessage.email}`}
+                        href={`tel:${selectedMessage.phone}`}
                         className="border border-[#101b18]/15 px-4 py-3 text-[9px] uppercase tracking-[0.16em] transition hover:border-[#174b32] hover:text-[#174b32]"
                       >
-                        Reply by Email
+                        Call Customer
                       </a>
-
-                      {selectedMessage.phone && (
-                        <a
-                          href={`tel:${selectedMessage.phone}`}
-                          className="border border-[#101b18]/15 px-4 py-3 text-[9px] uppercase tracking-[0.16em] transition hover:border-[#174b32] hover:text-[#174b32]"
-                        >
-                          Call Customer
-                        </a>
-                      )}
-                    </div>
+                    )}
 
                     <button
-                      onClick={() =>
-                        deleteMessage(selectedMessage.id)
-                      }
-                      className="px-4 py-3 text-[9px] uppercase tracking-[0.16em] text-red-700/60 transition hover:text-red-700"
+                      onClick={() => deleteMessage(selectedMessage.id)}
+                      className="px-4 py-3 text-[9px] uppercase tracking-[0.16em] text-red-700/70 transition hover:text-red-700"
                     >
                       Delete Message
                     </button>
                   </div>
-                </div>
+                </>
               )}
             </div>
           </div>
@@ -5218,9 +5280,11 @@ const [selectedMessage, setSelectedMessage] =
     </main>
   );
 }
+
 /* =========================================================
    ADMIN PRODUCTS
 ========================================================= */
+
 
 function AdminProductsPage() {
   const [name, setName] = useState("");
@@ -5247,24 +5311,24 @@ function AdminProductsPage() {
   ];
 
   const loadProducts = async () => {
-  setLoadingProducts(true);
+    setLoadingProducts(true);
 
-  const { data, error } = await supabase
-    .from("products")
-    .select("*")
-    .eq("is_active", true)
-    .order("created_at", { ascending: false });
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .eq("is_active", true)
+      .order("created_at", { ascending: false });
 
-  if (error) {
-    console.error("Error loading admin products:", error);
-    setProducts([]);
+    if (error) {
+      console.error("Error loading admin products:", error);
+      setProducts([]);
+      setLoadingProducts(false);
+      return;
+    }
+
+    setProducts((data ?? []) as Product[]);
     setLoadingProducts(false);
-    return;
-  }
-
-  setProducts((data ?? []) as Product[]);
-  setLoadingProducts(false);
-};
+  };
 
   useEffect(() => {
     loadProducts();
@@ -5328,7 +5392,6 @@ function AdminProductsPage() {
     try {
       let imageUrl = editingProduct?.image_url ?? null;
 
-      // Upload a new image if one was selected
       if (image) {
         const fileExtension =
           image.name.split(".").pop()?.toLowerCase() || "jpg";
@@ -5362,7 +5425,6 @@ function AdminProductsPage() {
       }
 
       if (editingProduct) {
-        // UPDATE EXISTING PRODUCT
         const { error: updateError } = await supabase
           .from("products")
           .update({
@@ -5378,16 +5440,13 @@ function AdminProductsPage() {
 
         if (updateError) {
           console.error("Product update error:", updateError);
-          setMessage(
-            `Product could not be updated: ${updateError.message}`,
-          );
+          setMessage(`Product could not be updated: ${updateError.message}`);
           setLoading(false);
           return;
         }
 
         setMessage("Product updated successfully.");
       } else {
-        // ADD NEW PRODUCT
         const { error: productError } = await supabase
           .from("products")
           .insert({
@@ -5401,9 +5460,7 @@ function AdminProductsPage() {
 
         if (productError) {
           console.error("Product insert error:", productError);
-          setMessage(
-            `Product could not be saved: ${productError.message}`,
-          );
+          setMessage(`Product could not be saved: ${productError.message}`);
           setLoading(false);
           return;
         }
@@ -5449,34 +5506,35 @@ function AdminProductsPage() {
     await loadProducts();
   };
 
- const toggleProductStatus = async (product: Product) => {
-  setMessage("");
+  const toggleProductStatus = async (product: Product) => {
+    setMessage("");
 
-  const { error } = await supabase
-    .from("products")
-    .update({
-      is_active: !product.is_active,
-    })
-    .eq("id", product.id);
+    const { error } = await supabase
+      .from("products")
+      .update({
+        is_active: !product.is_active,
+      })
+      .eq("id", product.id);
 
-  if (error) {
-    console.error("Status update error:", error);
-    setMessage(`Could not update product status: ${error.message}`);
-    return;
-  }
+    if (error) {
+      console.error("Status update error:", error);
+      setMessage(`Could not update product status: ${error.message}`);
+      return;
+    }
 
-  setMessage(
-    product.is_active
-      ? "Product hidden from store."
-      : "Product is now live on store.",
-  );
+    setMessage(
+      product.is_active
+        ? "Product hidden from store."
+        : "Product is now live on store.",
+    );
 
-  await loadProducts();
-};
+    await loadProducts();
+  };
 
   return (
     <main className="min-h-screen bg-[#f3f0e8] text-[#101b18]">
-      <header className="border-b border-[#101b18]/10 bg-[#101b18] px-6 py-5 text-white sm:px-10">
+      {/* HEADER */}
+      <header className="border-b border-white/10 bg-[#101b18] px-5 py-5 text-white sm:px-10">
         <div className="mx-auto flex max-w-[1400px] items-center justify-between">
           <div>
             <p className="text-[9px] uppercase tracking-[0.28em] text-white/40">
@@ -5490,23 +5548,20 @@ function AdminProductsPage() {
 
           <button
             onClick={() => navigate("/admin/dashboard")}
-            className="text-[9px] uppercase tracking-[0.2em] text-white/50 transition hover:text-white"
+            className="rounded-full border border-white/15 px-4 py-3 text-[9px] uppercase tracking-[0.16em] text-white/70 transition hover:border-white/40 hover:text-white"
           >
             ← Dashboard
           </button>
         </div>
       </header>
 
-      <div className="mx-auto max-w-[1100px] px-6 py-10 sm:px-10 lg:py-14">
-        {/* ============================================================
-            ADD / EDIT PRODUCT
-        ============================================================ */}
-
-        <div className="border border-[#101b18]/10 bg-white p-6 sm:p-8">
-          <div className="mb-8 flex items-start justify-between gap-6">
+      <div className="mx-auto max-w-[1100px] px-4 py-7 sm:px-10 sm:py-10 lg:py-14">
+        {/* ADD / EDIT PRODUCT */}
+        <div className="border border-[#101b18]/10 bg-white p-5 sm:p-8">
+          <div className="mb-8 flex items-start justify-between gap-4">
             <div>
               <p className="text-[9px] uppercase tracking-[0.22em] text-[#101b18]/40">
-                Store
+                Store management
               </p>
 
               <h2 className="mt-2 font-['Playfair_Display'] text-3xl">
@@ -5524,9 +5579,9 @@ function AdminProductsPage() {
               <button
                 type="button"
                 onClick={resetForm}
-                className="shrink-0 text-[9px] uppercase tracking-[0.18em] text-[#101b18]/45 transition hover:text-[#174b32]"
+                className="shrink-0 rounded-full border border-[#101b18]/15 px-3 py-2 text-[9px] uppercase tracking-[0.12em] text-[#101b18]/60 transition hover:bg-[#f3f0e8]"
               >
-                Cancel edit
+                Cancel
               </button>
             )}
           </div>
@@ -5651,7 +5706,7 @@ function AdminProductsPage() {
             </label>
 
             {message && (
-              <p className="border-l-2 border-[#174b32] bg-[#174b32]/5 px-4 py-3 text-xs text-[#174b32]">
+              <p className="border-l-2 border-[#174b32] bg-[#174b32]/5 px-4 py-3 text-xs leading-5 text-[#174b32]">
                 {message}
               </p>
             )}
@@ -5659,7 +5714,7 @@ function AdminProductsPage() {
             <button
               type="submit"
               disabled={loading}
-              className="flex w-full items-center justify-between border border-[#101b18] bg-[#101b18] px-5 py-4 text-left text-white transition hover:bg-[#174b32] disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex min-h-12 w-full items-center justify-between bg-[#101b18] px-5 py-4 text-white transition hover:bg-[#174b32] disabled:cursor-not-allowed disabled:opacity-50"
             >
               <span className="text-[9px] uppercase tracking-[0.2em]">
                 {loading
@@ -5676,12 +5731,9 @@ function AdminProductsPage() {
           </form>
         </div>
 
-        {/* ============================================================
-            PRODUCT LIST
-        ============================================================ */}
-
+        {/* PRODUCT LIST */}
         <div className="mt-12">
-          <div className="flex items-end justify-between border-b border-[#101b18]/10 pb-5">
+          <div className="flex items-end justify-between gap-4 border-b border-[#101b18]/10 pb-5">
             <div>
               <p className="text-[9px] uppercase tracking-[0.22em] text-[#101b18]/40">
                 Catalogue
@@ -5692,7 +5744,7 @@ function AdminProductsPage() {
               </h2>
             </div>
 
-            <span className="text-[9px] uppercase tracking-[0.18em] text-[#101b18]/35">
+            <span className="text-[9px] uppercase tracking-[0.12em] text-[#101b18]/40">
               {products.length} total
             </span>
           </div>
@@ -5710,11 +5762,11 @@ function AdminProductsPage() {
               </p>
             </div>
           ) : (
-            <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
+            <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5">
               {products.map((product) => (
                 <article
                   key={product.id}
-                  className="overflow-hidden border border-[#101b18]/10 bg-white"
+                  className="min-w-0 overflow-hidden border border-[#101b18]/10 bg-white"
                 >
                   <div className="aspect-square bg-[#e8e3d8]">
                     {product.image_url ? (
@@ -5728,56 +5780,129 @@ function AdminProductsPage() {
                     )}
                   </div>
 
-                  <div className="p-4">
-                    <p className="text-[8px] uppercase tracking-[0.15em] text-[#174b32]">
+                  <div className="p-3 sm:p-5">
+                    <p className="text-[8px] uppercase tracking-[0.12em] text-[#174b32] sm:text-[9px] sm:tracking-[0.15em]">
                       {product.category}
                     </p>
 
-                    <h3 className="mt-2 font-['Playfair_Display'] text-lg leading-tight">
+                    <h3 className="mt-2 break-words font-['Playfair_Display'] text-base leading-snug sm:text-xl">
                       {product.name}
                     </h3>
 
-                    <p className="mt-2 text-xs text-[#101b18]/55">
+                    <p className="mt-2 text-xs font-medium text-[#101b18]/65 sm:text-sm">
                       ₦{Number(product.price).toLocaleString("en-NG")}
                     </p>
 
-                    <p
-                      className={`mt-3 text-[8px] uppercase tracking-[0.15em] ${
-                        product.is_active
-                          ? "text-[#174b32]"
-                          : "text-black/30"
-                      }`}
-                    >
-                      {product.is_active ? "Live on store" : "Hidden"}
-                    </p>
-
-                    {/* ACTIONS */}
-
-                    <div className="mt-4 grid grid-cols-3 border-t border-[#101b18]/10">
-                      <button
-                        type="button"
-                        onClick={() => startEditing(product)}
-                        className="border-r border-[#101b18]/10 py-3 text-[8px] uppercase tracking-[0.12em] text-[#101b18]/60 transition hover:bg-[#f3f0e8] hover:text-[#174b32]"
+                    <div className="mt-3">
+                      <span
+                        className={`inline-flex items-center gap-1.5 text-[8px] uppercase tracking-[0.1em] sm:text-[9px] ${
+                          product.is_active
+                            ? "text-[#174b32]"
+                            : "text-[#101b18]/40"
+                        }`}
                       >
-                        Edit
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => toggleProductStatus(product)}
-                        className="border-r border-[#101b18]/10 py-3 text-[8px] uppercase tracking-[0.12em] text-[#101b18]/60 transition hover:bg-[#f3f0e8] hover:text-[#174b32]"
-                      >
-                        {product.is_active ? "Hide" : "Show"}
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => deleteProduct(product)}
-                        className="py-3 text-[8px] uppercase tracking-[0.12em] text-[#101b18]/60 transition hover:bg-red-50 hover:text-red-700"
-                      >
-                        Delete
-                      </button>
+                        <span
+                          className={`h-1.5 w-1.5 rounded-full ${
+                            product.is_active
+                              ? "bg-[#174b32]"
+                              : "bg-[#101b18]/30"
+                          }`}
+                        />
+                        {product.is_active ? "Live on store" : "Hidden"}
+                      </span>
                     </div>
+
+                   
+{/* PRODUCT ACTIONS */}
+<div className="mt-4 grid grid-cols-2 gap-2.5 border-t border-[#101b18]/10 pt-4 sm:mt-5 sm:gap-3 sm:pt-4">
+  {/* EDIT */}
+  <button
+    type="button"
+    onClick={() => startEditing(product)}
+    className="flex min-h-11 min-w-0 items-center justify-center gap-2 rounded-lg border border-[#101b18]/15 bg-white px-2 py-3 text-[10px] font-medium uppercase tracking-[0.06em] text-[#101b18] transition hover:border-[#174b32] hover:bg-[#f3f0e8] active:scale-[0.98] sm:text-[11px]"
+  >
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      className="h-4 w-4 shrink-0"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="m14 5 5 5M4 20l4.5-1 10.8-10.8a2.1 2.1 0 0 0-3-3L5.5 16 4 20Z"
+      />
+    </svg>
+    <span>Edit</span>
+  </button>
+
+  {/* SHOW / HIDE */}
+  <button
+    type="button"
+    onClick={() => toggleProductStatus(product)}
+    className="flex min-h-11 min-w-0 items-center justify-center gap-2 rounded-lg border border-[#174b32]/20 bg-[#174b32]/5 px-2 py-3 text-[10px] font-medium uppercase tracking-[0.03em] text-[#174b32] transition hover:bg-[#174b32]/10 active:scale-[0.98] sm:text-11px]"
+  >
+    {product.is_active ? (
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        className="h-4 w-4 shrink-0"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M3 3l18 18M10.6 10.6a2 2 0 0 0 2.8 2.8M9.9 5.2A10.8 10.8 0 0 1 12 5c5.5 0 9 7 9 7a15 15 0 0 1-3.1 3.8M6.2 6.2C4.1 7.6 3 12 3 12s3.5 7 9 7a9 9 0 0 0 3-.5"
+        />
+      </svg>
+    ) : (
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        className="h-4 w-4 shrink-0"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M3 12s3.5-7 9-7 9 7 9 7-3.5 7-9 7-9-7-9-7Z"
+        />
+        <circle cx="12" cy="12" r="2.5" />
+      </svg>
+    )}
+    <span>{product.is_active ? "Hide" : "Show"}</span>
+  </button>
+
+  {/* DELETE */}
+  <button
+    type="button"
+    onClick={() => deleteProduct(product)}
+    className="col-span-2 flex min-h-11 items-center justify-center gap-2 rounded-lg border border-red-200 bg-red-50/60 px-3 py-3 text-[10px] font-medium uppercase tracking-[0.1em] text-red-700 transition hover:border-red-300 hover:bg-red-50 active:scale-[0.99] sm:text-[11px]"
+  >
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      className="h-4 w-4 shrink-0"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M4 7h16M10 11v6m4-6v6M5.5 7l1 13h11l1-13M9 7V4h6v3"
+      />
+    </svg>
+    <span>Delete</span>
+  </button>
+</div>
+
                   </div>
                 </article>
               ))}
@@ -5788,6 +5913,8 @@ function AdminProductsPage() {
     </main>
   );
 }
+
+
 
 
 function AdminSettingsPage() {
@@ -5807,36 +5934,44 @@ function AdminSettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [newLoginEmail, setNewLoginEmail] = useState("");
+  const [securitySaving, setSecuritySaving] = useState(false);
+  const [securityMessage, setSecurityMessage] = useState("");
+  const [securityError, setSecurityError] = useState("");
+
   useEffect(() => {
     const loadSettings = async () => {
-      const { data, error } = await supabase
-        .from("store_settings")
-        .select("*")
-        .limit(1)
-        .maybeSingle();
+      try {
+        const { data, error } = await supabase
+          .from("store_settings")
+          .select("*")
+          .limit(1)
+          .maybeSingle();
 
-      if (error) {
+        if (error) throw error;
+
+        if (data) {
+          setSettings({
+            store_name: data.store_name ?? "",
+            phone: data.phone ?? "",
+            whatsapp: data.whatsapp ?? "",
+            email: data.email ?? "",
+            address: data.address ?? "",
+            instagram_url: data.instagram_url ?? "",
+            facebook_url: data.facebook_url ?? "",
+            youtube_url: data.youtube_url ?? "",
+            linkedin_url: data.linkedin_url ?? "",
+            x_url: data.x_url ?? "",
+          });
+        }
+      } catch (error) {
         console.error("Error loading store settings:", error);
+      } finally {
         setLoading(false);
-        return;
       }
-
-      if (data) {
-        setSettings({
-          store_name: data.store_name ?? "",
-          phone: data.phone ?? "",
-          whatsapp: data.whatsapp ?? "",
-          email: data.email ?? "",
-          address: data.address ?? "",
-          instagram_url: data.instagram_url ?? "",
-          facebook_url: data.facebook_url ?? "",
-          youtube_url: data.youtube_url ?? "",
-          linkedin_url: data.linkedin_url ?? "",
-          x_url: data.x_url ?? "",
-        });
-      }
-
-      setLoading(false);
     };
 
     loadSettings();
@@ -5852,54 +5987,170 @@ function AdminSettingsPage() {
     }));
   };
 
-  const handleSave = async (event: React.FormEvent) => {
+  const handleSave = async (
+    event: React.FormEvent<HTMLFormElement>,
+  ) => {
     event.preventDefault();
     setSaving(true);
 
-    const { data: existing, error: existingError } = await supabase
-      .from("store_settings")
-      .select("id")
-      .limit(1)
-      .maybeSingle();
-
-    if (existingError) {
-      console.error("Error checking store settings:", existingError);
-      alert("Could not save store details.");
-      setSaving(false);
-      return;
-    }
-
-    let error;
-
-    if (existing) {
-      const result = await supabase
+    try {
+      const { data: existing, error: existingError } = await supabase
         .from("store_settings")
-        .update({
-          ...settings,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", existing.id);
+        .select("id")
+        .limit(1)
+        .maybeSingle();
 
-      error = result.error;
-    } else {
-      const result = await supabase
-        .from("store_settings")
-        .insert({
-          ...settings,
-        });
+      if (existingError) throw existingError;
 
-      error = result.error;
-    }
+      let error;
 
-    if (error) {
+      if (existing) {
+        const result = await supabase
+          .from("store_settings")
+          .update({
+            ...settings,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", existing.id);
+
+        error = result.error;
+      } else {
+        const result = await supabase
+          .from("store_settings")
+          .insert(settings);
+
+        error = result.error;
+      }
+
+      if (error) throw error;
+
+      alert("Store details saved successfully.");
+    } catch (error: any) {
       console.error("Error saving store settings:", error);
-      alert("Could not save store details.");
+      alert(error.message || "Could not save store details.");
+    } finally {
       setSaving(false);
+    }
+  };
+
+  const handleChangePassword = async (
+    event: React.FormEvent<HTMLFormElement>,
+  ) => {
+    event.preventDefault();
+    setSecurityMessage("");
+    setSecurityError("");
+
+    if (!currentPassword) {
+      setSecurityError("Enter your current password.");
       return;
     }
 
-    alert("Store details saved successfully.");
-    setSaving(false);
+    if (newPassword.length < 8) {
+      setSecurityError(
+        "Your new password must be at least 8 characters.",
+      );
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setSecurityError("The new passwords do not match.");
+      return;
+    }
+
+    if (newPassword === currentPassword) {
+      setSecurityError(
+        "Your new password must be different from your current password.",
+      );
+      return;
+    }
+
+    setSecuritySaving(true);
+
+    try {
+      const { data, error } = await supabase.rpc(
+        "change_admin_credentials",
+        {
+          p_current_password: currentPassword,
+          p_new_email: null,
+          p_new_password: newPassword,
+        },
+      );
+
+      if (error) throw error;
+
+      if (data !== true) {
+        throw new Error("Your current password is incorrect.");
+      }
+
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+
+      setSecurityMessage(
+        "Password changed successfully. Use your new password next time you sign in.",
+      );
+    } catch (error: any) {
+      console.error("Password change failed:", error);
+      setSecurityError(
+        error.message || "Unable to change password.",
+      );
+    } finally {
+      setSecuritySaving(false);
+    }
+  };
+
+  const handleChangeLoginEmail = async (
+    event: React.FormEvent<HTMLFormElement>,
+  ) => {
+    event.preventDefault();
+    setSecurityMessage("");
+    setSecurityError("");
+
+    const email = newLoginEmail.trim().toLowerCase();
+
+    if (!currentPassword) {
+      setSecurityError("Enter your current password.");
+      return;
+    }
+
+    if (!email) {
+      setSecurityError("Enter your new login email.");
+      return;
+    }
+
+    setSecuritySaving(true);
+
+    try {
+      const { data, error } = await supabase.rpc(
+        "change_admin_credentials",
+        {
+          p_current_password: currentPassword,
+          p_new_email: email,
+          p_new_password: null,
+        },
+      );
+
+      if (error) throw error;
+
+      if (data !== true) {
+        throw new Error("Your current password is incorrect.");
+      }
+
+      setCurrentPassword("");
+      setNewLoginEmail("");
+
+      setSecurityMessage(
+        "Login email changed successfully. Use the new email the next time you sign in.",
+      );
+    } catch (error: any) {
+      console.error("Login email change failed:", error);
+      setSecurityError(
+        error.message ||
+          "Unable to change login email. Make sure the address is valid and not already in use.",
+      );
+    } finally {
+      setSecuritySaving(false);
+    }
   };
 
   if (loading) {
@@ -5914,23 +6165,19 @@ function AdminSettingsPage() {
 
   return (
     <main className="min-h-screen bg-[#f3f0e8] text-[#101b18]">
-      {/* =====================================================
-          HEADER
-      ===================================================== */}
-
       <header className="border-b border-[#101b18]/10 bg-[#101b18] px-6 py-5 text-white sm:px-10">
         <div className="mx-auto flex max-w-[1400px] items-center justify-between">
           <div>
             <p className="text-[9px] uppercase tracking-[0.28em] text-white/40">
               FOBCA Limited
             </p>
-
             <h1 className="mt-1 font-['Playfair_Display'] text-2xl">
               Store Details
             </h1>
           </div>
 
           <button
+            type="button"
             onClick={() => navigate("/admin/dashboard")}
             className="text-[9px] uppercase tracking-[0.2em] text-white/50 transition hover:text-white"
           >
@@ -5941,35 +6188,24 @@ function AdminSettingsPage() {
 
       <div className="mx-auto max-w-[1000px] px-6 py-10 sm:px-10 lg:py-14">
         <form onSubmit={handleSave}>
-
-          {/* =====================================================
-              BUSINESS INFORMATION
-          ===================================================== */}
-
           <div className="border border-[#101b18]/10 bg-white p-6 sm:p-8 lg:p-10">
             <div className="border-b border-[#101b18]/10 pb-7">
               <p className="text-[9px] uppercase tracking-[0.22em] text-[#101b18]/40">
                 Business information
               </p>
-
               <h2 className="mt-3 font-['Playfair_Display'] text-3xl">
                 FOBCA details
               </h2>
-
               <p className="mt-3 max-w-xl text-sm leading-6 text-[#101b18]/50">
                 These details can be used across the FOBCA website and store.
               </p>
             </div>
 
             <div className="mt-8 grid gap-6 sm:grid-cols-2">
-
-              {/* COMPANY NAME */}
-
               <div>
                 <label className="text-[9px] uppercase tracking-[0.18em] text-[#101b18]/45">
                   Company Name
                 </label>
-
                 <input
                   type="text"
                   value={settings.store_name}
@@ -5981,13 +6217,10 @@ function AdminSettingsPage() {
                 />
               </div>
 
-              {/* EMAIL */}
-
               <div>
                 <label className="text-[9px] uppercase tracking-[0.18em] text-[#101b18]/45">
-                  Email
+                  Business Email
                 </label>
-
                 <input
                   type="email"
                   value={settings.email}
@@ -5997,15 +6230,15 @@ function AdminSettingsPage() {
                   placeholder="info@fobcalimited.com"
                   className="mt-2 w-full border-b border-[#101b18]/15 bg-transparent px-0 py-3 text-sm outline-none transition focus:border-[#174b32]"
                 />
+                <p className="mt-2 text-xs text-[#101b18]/40">
+                  Public contact email, separate from the admin login email.
+                </p>
               </div>
-
-              {/* PHONE */}
 
               <div>
                 <label className="text-[9px] uppercase tracking-[0.18em] text-[#101b18]/45">
                   Phone
                 </label>
-
                 <input
                   type="text"
                   value={settings.phone}
@@ -6017,13 +6250,10 @@ function AdminSettingsPage() {
                 />
               </div>
 
-              {/* WHATSAPP */}
-
               <div>
                 <label className="text-[9px] uppercase tracking-[0.18em] text-[#101b18]/45">
                   WhatsApp
                 </label>
-
                 <input
                   type="text"
                   value={settings.whatsapp}
@@ -6035,13 +6265,10 @@ function AdminSettingsPage() {
                 />
               </div>
 
-              {/* ADDRESS */}
-
               <div className="sm:col-span-2">
                 <label className="text-[9px] uppercase tracking-[0.18em] text-[#101b18]/45">
                   Address
                 </label>
-
                 <textarea
                   value={settings.address}
                   onChange={(event) =>
@@ -6055,123 +6282,46 @@ function AdminSettingsPage() {
             </div>
           </div>
 
-          {/* =====================================================
-              SOCIAL MEDIA
-          ===================================================== */}
-
           <div className="mt-6 border border-[#101b18]/10 bg-white p-6 sm:p-8 lg:p-10">
             <div className="border-b border-[#101b18]/10 pb-7">
               <p className="text-[9px] uppercase tracking-[0.22em] text-[#101b18]/40">
                 Social media
               </p>
-
               <h2 className="mt-3 font-['Playfair_Display'] text-3xl">
                 Social links
               </h2>
-
               <p className="mt-3 max-w-xl text-sm leading-6 text-[#101b18]/50">
-                Add the official FOBCA social media profiles. These links will
-                appear as social icons in the website footer.
+                Add the official FOBCA social media profiles for the website footer.
               </p>
             </div>
 
             <div className="mt-8 space-y-6">
-
-              {/* INSTAGRAM */}
-
-              <div>
-                <label className="text-[9px] uppercase tracking-[0.18em] text-[#101b18]/45">
-                  Instagram
-                </label>
-
-                <input
-                  type="url"
-                  value={settings.instagram_url}
-                  onChange={(event) =>
-                    handleChange("instagram_url", event.target.value)
-                  }
-                  placeholder="https://instagram.com/..."
-                  className="mt-2 w-full border-b border-[#101b18]/15 bg-transparent px-0 py-3 text-sm outline-none transition focus:border-[#174b32]"
-                />
-              </div>
-
-              {/* FACEBOOK */}
-
-              <div>
-                <label className="text-[9px] uppercase tracking-[0.18em] text-[#101b18]/45">
-                  Facebook
-                </label>
-
-                <input
-                  type="url"
-                  value={settings.facebook_url}
-                  onChange={(event) =>
-                    handleChange("facebook_url", event.target.value)
-                  }
-                  placeholder="https://facebook.com/..."
-                  className="mt-2 w-full border-b border-[#101b18]/15 bg-transparent px-0 py-3 text-sm outline-none transition focus:border-[#174b32]"
-                />
-              </div>
-
-              {/* YOUTUBE */}
-
-              <div>
-                <label className="text-[9px] uppercase tracking-[0.18em] text-[#101b18]/45">
-                  YouTube
-                </label>
-
-                <input
-                  type="url"
-                  value={settings.youtube_url}
-                  onChange={(event) =>
-                    handleChange("youtube_url", event.target.value)
-                  }
-                  placeholder="https://youtube.com/@..."
-                  className="mt-2 w-full border-b border-[#101b18]/15 bg-transparent px-0 py-3 text-sm outline-none transition focus:border-[#174b32]"
-                />
-              </div>
-
-              {/* LINKEDIN */}
-
-              <div>
-                <label className="text-[9px] uppercase tracking-[0.18em] text-[#101b18]/45">
-                  LinkedIn
-                </label>
-
-                <input
-                  type="url"
-                  value={settings.linkedin_url}
-                  onChange={(event) =>
-                    handleChange("linkedin_url", event.target.value)
-                  }
-                  placeholder="https://linkedin.com/company/..."
-                  className="mt-2 w-full border-b border-[#101b18]/15 bg-transparent px-0 py-3 text-sm outline-none transition focus:border-[#174b32]"
-                />
-              </div>
-
-              {/* X */}
-
-              <div>
-                <label className="text-[9px] uppercase tracking-[0.18em] text-[#101b18]/45">
-                  X
-                </label>
-
-                <input
-                  type="url"
-                  value={settings.x_url}
-                  onChange={(event) =>
-                    handleChange("x_url", event.target.value)
-                  }
-                  placeholder="https://x.com/..."
-                  className="mt-2 w-full border-b border-[#101b18]/15 bg-transparent px-0 py-3 text-sm outline-none transition focus:border-[#174b32]"
-                />
-              </div>
+              {(
+                [
+                  ["instagram_url", "Instagram", "https://instagram.com/..."],
+                  ["facebook_url", "Facebook", "https://facebook.com/..."],
+                  ["youtube_url", "YouTube", "https://youtube.com/@..."],
+                  ["linkedin_url", "LinkedIn", "https://linkedin.com/company/..."],
+                  ["x_url", "X", "https://x.com/..."],
+                ] as const
+              ).map(([field, label, placeholder]) => (
+                <div key={field}>
+                  <label className="text-[9px] uppercase tracking-[0.18em] text-[#101b18]/45">
+                    {label}
+                  </label>
+                  <input
+                    type="url"
+                    value={settings[field]}
+                    onChange={(event) =>
+                      handleChange(field, event.target.value)
+                    }
+                    placeholder={placeholder}
+                    className="mt-2 w-full border-b border-[#101b18]/15 bg-transparent px-0 py-3 text-sm outline-none transition focus:border-[#174b32]"
+                  />
+                </div>
+              ))}
             </div>
           </div>
-
-          {/* =====================================================
-              ACTIONS
-          ===================================================== */}
 
           <div className="mt-6 flex items-center justify-between gap-5">
             <button
@@ -6191,10 +6341,658 @@ function AdminSettingsPage() {
             </button>
           </div>
         </form>
+
+        <section className="mt-12 border border-[#101b18]/10 bg-white p-6 sm:p-8 lg:p-10">
+          <div className="border-b border-[#101b18]/10 pb-7">
+            <p className="text-[9px] uppercase tracking-[0.22em] text-[#174b32]">
+              Account security
+            </p>
+            <h2 className="mt-3 font-['Playfair_Display'] text-3xl">
+              Login & Security
+            </h2>
+            <p className="mt-3 max-w-xl text-sm leading-6 text-[#101b18]/50">
+              Change the credentials used to access the admin dashboard.
+            </p>
+          </div>
+
+          {securityMessage && (
+            <p
+              role="status"
+              className="mt-6 border border-green-200 bg-green-50 p-4 text-sm leading-6 text-green-800"
+            >
+              {securityMessage}
+            </p>
+          )}
+
+          {securityError && (
+            <p
+              role="alert"
+              className="mt-6 border border-red-200 bg-red-50 p-4 text-sm leading-6 text-red-700"
+            >
+              {securityError}
+            </p>
+          )}
+
+          <div className="mt-8">
+            <h3 className="font-['Playfair_Display'] text-xl">
+              Change password
+            </h3>
+
+            <form onSubmit={handleChangePassword} className="mt-5 space-y-5">
+              <div>
+                <label className="text-[9px] uppercase tracking-[0.18em] text-[#101b18]/45">
+                  Current password
+                </label>
+                <input
+                  type="password"
+                  value={currentPassword}
+                  onChange={(event) =>
+                    setCurrentPassword(event.target.value)
+                  }
+                  required
+                  autoComplete="current-password"
+                  className="mt-2 w-full border-b border-[#101b18]/15 bg-transparent px-0 py-3 text-sm outline-none focus:border-[#174b32]"
+                />
+              </div>
+
+              <div>
+                <label className="text-[9px] uppercase tracking-[0.18em] text-[#101b18]/45">
+                  New password
+                </label>
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(event) => setNewPassword(event.target.value)}
+                  required
+                  minLength={8}
+                  autoComplete="new-password"
+                  className="mt-2 w-full border-b border-[#101b18]/15 bg-transparent px-0 py-3 text-sm outline-none focus:border-[#174b32]"
+                />
+                <p className="mt-2 text-xs text-[#101b18]/40">
+                  Use at least 8 characters.
+                </p>
+              </div>
+
+              <div>
+                <label className="text-[9px] uppercase tracking-[0.18em] text-[#101b18]/45">
+                  Confirm new password
+                </label>
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(event) =>
+                    setConfirmPassword(event.target.value)
+                  }
+                  required
+                  minLength={8}
+                  autoComplete="new-password"
+                  className="mt-2 w-full border-b border-[#101b18]/15 bg-transparent px-0 py-3 text-sm outline-none focus:border-[#174b32]"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={securitySaving}
+                className="bg-[#174b32] px-5 py-3 text-[9px] uppercase tracking-[0.2em] text-white transition hover:bg-[#101b18] disabled:opacity-50"
+              >
+                {securitySaving ? "Updating..." : "Change password"}
+              </button>
+            </form>
+          </div>
+
+          <div className="mt-10 border-t border-[#101b18]/10 pt-8">
+            <h3 className="font-['Playfair_Display'] text-xl">
+              Change login email
+            </h3>
+
+            <form onSubmit={handleChangeLoginEmail} className="mt-5 space-y-5">
+              <div>
+                <label className="text-[9px] uppercase tracking-[0.18em] text-[#101b18]/45">
+                  Current password
+                </label>
+                <input
+                  type="password"
+                  value={currentPassword}
+                  onChange={(event) =>
+                    setCurrentPassword(event.target.value)
+                  }
+                  required
+                  autoComplete="current-password"
+                  className="mt-2 w-full border-b border-[#101b18]/15 bg-transparent px-0 py-3 text-sm outline-none focus:border-[#174b32]"
+                />
+              </div>
+
+              <div>
+                <label className="text-[9px] uppercase tracking-[0.18em] text-[#101b18]/45">
+                  New login email
+                </label>
+                <input
+                  type="email"
+                  value={newLoginEmail}
+                  onChange={(event) => setNewLoginEmail(event.target.value)}
+                  required
+                  autoComplete="email"
+                  placeholder="newemail@example.com"
+                  className="mt-2 w-full border-b border-[#101b18]/15 bg-transparent px-0 py-3 text-sm outline-none focus:border-[#174b32]"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={securitySaving}
+                className="border border-[#101b18]/20 px-5 py-3 text-[9px] uppercase tracking-[0.2em] transition hover:border-[#174b32] hover:text-[#174b32] disabled:opacity-50"
+              >
+                {securitySaving ? "Updating..." : "Change login email"}
+              </button>
+
+              <p className="text-xs leading-5 text-[#101b18]/45">
+                Your new email will be used for the next table-based login.
+              </p>
+            </form>
+          </div>
+        </section>
       </div>
     </main>
   );
 }
+
+
+
+function AdminCollectionsPage() {
+  const [collections, setCollections] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+
+  const emptyForm = {
+    name: "",
+    description: "",
+    details: "",
+    display_order: 1,
+    is_active: true,
+    image: "",
+  };
+
+  const [form, setForm] = useState(emptyForm);
+
+  const getImageUrl = (image: string) => {
+    if (!image) return "";
+
+    if (image.startsWith("http")) return image;
+
+    return supabase.storage
+      .from("collection-images")
+      .getPublicUrl(image)
+      .data.publicUrl;
+  };
+
+  const loadCollections = async () => {
+    setLoading(true);
+    setError("");
+
+    const { data, error } = await supabase
+      .from("collections")
+      .select("*")
+      .order("display_order", { ascending: true });
+
+    if (error) {
+      setError(error.message);
+    } else {
+      setCollections(data || []);
+    }
+
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    loadCollections();
+  }, []);
+
+  const resetForm = () => {
+    setForm({
+      ...emptyForm,
+      display_order: collections.length + 1,
+    });
+    setEditingId(null);
+    setSelectedImage(null);
+  };
+
+  const handleEdit = (collection: any) => {
+    setEditingId(collection.id);
+    setForm({
+      name: collection.name || "",
+      description: collection.description || "",
+      details: collection.details || "",
+      display_order: collection.display_order,
+      is_active: collection.is_active,
+      image: collection.image || "",
+    });
+    setSelectedImage(null);
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleSave = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSaving(true);
+    setError("");
+
+    try {
+      let imagePath = form.image;
+
+      if (selectedImage) {
+        const safeName = selectedImage.name.replace(/[^a-zA-Z0-9._-]/g, "-");
+        const filePath = `${Date.now()}-${safeName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("collection-images")
+          .upload(filePath, selectedImage, { upsert: true });
+
+        if (uploadError) throw uploadError;
+
+        imagePath = filePath;
+      }
+
+      if (!imagePath) {
+        throw new Error("Please select an image for this collection.");
+      }
+
+      const collectionData = {
+        name: form.name.trim(),
+        description: form.description.trim() || null,
+        details: form.details.trim() || null,
+        display_order: Number(form.display_order),
+        is_active: form.is_active,
+        image: imagePath,
+        updated_at: new Date().toISOString(),
+      };
+
+      if (editingId) {
+        const { error: updateError } = await supabase
+          .from("collections")
+          .update(collectionData)
+          .eq("id", editingId);
+
+        if (updateError) throw updateError;
+      } else {
+        const { error: insertError } = await supabase
+          .from("collections")
+          .insert({
+            ...collectionData,
+            created_at: new Date().toISOString(),
+          });
+
+        if (insertError) throw insertError;
+      }
+
+      await loadCollections();
+      resetForm();
+    } catch (err: any) {
+      setError(err.message || "Unable to save collection.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const toggleActive = async (collection: any) => {
+    const { error } = await supabase
+      .from("collections")
+      .update({
+        is_active: !collection.is_active,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", collection.id);
+
+    if (error) {
+      setError(error.message);
+      return;
+    }
+
+    await loadCollections();
+  };
+
+ 
+const handleDelete = async (collection: any) => {
+  const confirmed = window.confirm(
+    `Delete "${collection.name}" and its uploaded image? This cannot be undone.`,
+  );
+
+  if (!confirmed) return;
+
+  const { error: deleteError } = await supabase
+    .from("collections")
+    .delete()
+    .eq("id", collection.id);
+
+  if (deleteError) {
+    setError(deleteError.message);
+    return;
+  }
+
+  // Remove the associated image from Supabase Storage.
+  let imagePath = collection.image || "";
+
+  if (imagePath.startsWith("http")) {
+    const marker = "/collection-images/";
+    imagePath = imagePath.includes(marker)
+      ? decodeURIComponent(
+          imagePath.split(marker).pop()?.split("?")[0] || "",
+        )
+      : "";
+  }
+
+  if (imagePath) {
+    const { error: storageError } = await supabase.storage
+      .from("collection-images")
+      .remove([imagePath]);
+
+    if (storageError) {
+      setError(
+        `Collection deleted, but its image could not be removed: ${storageError.message}`,
+      );
+    }
+  }
+
+  if (editingId === collection.id) resetForm();
+
+  await loadCollections();
+};
+
+
+  return (
+    <main className="min-h-screen bg-[#f3f0e8] text-[#101b18]">
+      <header className="bg-[#101b18] px-5 py-6 text-white sm:px-10">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
+          <div>
+            <p className="text-[9px] uppercase tracking-[0.3em] text-white/50">
+              Fobca Limited · Administration
+            </p>
+            <h1 className="mt-2 font-serif text-2xl sm:text-3xl">
+              Collections
+            </h1>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => navigate("/admin/dashboard")}
+            className="border border-white/20 px-4 py-3 text-[9px] uppercase tracking-[0.2em] transition hover:bg-white hover:text-[#101b18]"
+          >
+            Dashboard
+          </button>
+        </div>
+      </header>
+
+      <div className="mx-auto max-w-7xl px-5 py-10 sm:px-10 sm:py-14">
+        <div className="mb-8">
+          <p className="text-[10px] uppercase tracking-[0.25em] text-[#174b32]">
+            Store management
+          </p>
+          <h2 className="mt-2 font-serif text-2xl sm:text-3xl">
+            Manage your collections
+          </h2>
+          <p className="mt-2 max-w-xl text-sm leading-6 text-[#101b18]/60">
+            Add new furniture collections, update images and descriptions, or
+            control which collections appear on your store.
+          </p>
+        </div>
+
+        {error && (
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+            <span>{error}</span>
+            <button
+              type="button"
+              onClick={() => setError("")}
+              className="text-xs underline"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
+
+        <section className="mb-12 border border-black/10 bg-white/60 p-5 sm:p-8">
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-[9px] uppercase tracking-[0.25em] text-[#174b32]">
+                {editingId ? "Update collection" : "New collection"}
+              </p>
+              <h3 className="mt-2 font-serif text-xl">
+                {editingId ? "Edit collection details" : "Add a collection"}
+              </h3>
+            </div>
+
+            {editingId && (
+              <button
+                type="button"
+                onClick={resetForm}
+                className="text-[9px] uppercase tracking-[0.2em] text-[#101b18]/60 underline"
+              >
+                Cancel editing
+              </button>
+            )}
+          </div>
+
+          <form onSubmit={handleSave} className="space-y-5">
+            <div className="grid gap-5 md:grid-cols-2">
+              <div>
+                <label className="mb-2 block text-[10px] uppercase tracking-[0.15em]">
+                  Collection name *
+                </label>
+                <input
+                  required
+                  value={form.name}
+                  onChange={(e) =>
+                    setForm({ ...form, name: e.target.value })
+                  }
+                  placeholder="e.g. Bedroom Sets"
+                  className="w-full border border-black/15 bg-transparent px-4 py-3 text-sm outline-none transition focus:border-[#174b32]"
+                />
+              </div>
+
+             
+            </div>
+
+            <div>
+              <label className="mb-2 block text-[10px] uppercase tracking-[0.15em]">
+                Description
+              </label>
+              <textarea
+                rows={3}
+                value={form.description}
+                onChange={(e) =>
+                  setForm({ ...form, description: e.target.value })
+                }
+                placeholder="A short description shown on the store."
+                className="w-full resize-y border border-black/15 bg-transparent px-4 py-3 text-sm outline-none focus:border-[#174b32]"
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-[10px] uppercase tracking-[0.15em]">
+                Extra details
+              </label>
+              <input
+                value={form.details}
+                onChange={(e) =>
+                  setForm({ ...form, details: e.target.value })
+                }
+                placeholder="e.g. Walnut · Black · Oak · White"
+                className="w-full border border-black/15 bg-transparent px-4 py-3 text-sm outline-none focus:border-[#174b32]"
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-[10px] uppercase tracking-[0.15em]">
+                Collection image {!editingId && "*"}
+              </label>
+
+              {form.image && (
+                <img
+                  src={getImageUrl(form.image)}
+                  alt="Current collection"
+                  className="mb-3 h-32 w-40 object-cover"
+                />
+              )}
+
+              <input
+                type="file"
+                accept="image/*"
+                required={!editingId && !form.image}
+                onChange={(e) =>
+                  setSelectedImage(e.target.files?.[0] || null)
+                }
+                className="block w-full text-sm file:mr-4 file:border-0 file:bg-[#101b18] file:px-4 file:py-3 file:text-xs file:uppercase file:tracking-wider file:text-white"
+              />
+
+              {selectedImage && (
+                <p className="mt-2 text-xs text-[#174b32]">
+                  Selected: {selectedImage.name}
+                </p>
+              )}
+
+              {editingId && (
+                <p className="mt-2 text-xs text-[#101b18]/50">
+                  Choose a new image only if you want to replace the current one.
+                </p>
+              )}
+            </div>
+
+            <label className="flex cursor-pointer items-center gap-3 text-sm">
+              <input
+                type="checkbox"
+                checked={form.is_active}
+                onChange={(e) =>
+                  setForm({ ...form, is_active: e.target.checked })
+                }
+                className="h-4 w-4 accent-[#174b32]"
+              />
+              Show this collection on the store
+            </label>
+
+            <button
+              type="submit"
+              disabled={saving}
+              className="w-full bg-[#174b32] px-6 py-4 text-[10px] uppercase tracking-[0.2em] text-white transition hover:bg-[#101b18] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+            >
+              {saving
+                ? "Saving..."
+                : editingId
+                  ? "Save changes"
+                  : "Add collection"}
+            </button>
+          </form>
+        </section>
+
+        <section>
+          <div className="mb-5 flex items-end justify-between gap-4">
+            <div>
+              <p className="text-[9px] uppercase tracking-[0.25em] text-[#174b32]">
+                Your store
+              </p>
+              <h3 className="mt-2 font-serif text-xl">
+                Existing collections
+              </h3>
+            </div>
+
+            <span className="text-xs text-[#101b18]/50">
+              {collections.length} total
+            </span>
+          </div>
+
+          {loading ? (
+            <div className="py-12 text-sm text-[#101b18]/50">
+              Loading collections...
+            </div>
+          ) : collections.length === 0 ? (
+            <div className="border border-dashed border-black/20 py-12 text-center">
+              <p className="font-serif text-lg">No collections yet</p>
+              <p className="mt-2 text-sm text-[#101b18]/50">
+                Add your first collection using the form above.
+              </p>
+            </div>
+          ) : (
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {collections.map((collection) => (
+                <article
+                  key={collection.id}
+                  className="overflow-hidden border border-black/10 bg-white/60"
+                >
+                  <div className="relative aspect-[4/3] bg-[#e8e5dc]">
+                    {collection.image && (
+                      <img
+                        src={getImageUrl(collection.image)}
+                        alt={collection.name}
+                        className="h-full w-full object-cover"
+                      />
+                    )}
+
+                    <span
+                      className={`absolute left-3 top-3 px-3 py-2 text-[9px] uppercase tracking-wider ${
+                        collection.is_active
+                          ? "bg-[#174b32] text-white"
+                          : "bg-white text-[#101b18]"
+                      }`}
+                    >
+                      {collection.is_active ? "Visible" : "Hidden"}
+                    </span>
+
+                    <span className="absolute right-3 top-3 bg-white/90 px-3 py-2 text-[9px] uppercase tracking-wider">
+                      Order {collection.display_order}
+                    </span>
+                  </div>
+
+                  <div className="p-5">
+                    <h4 className="font-serif text-xl">{collection.name}</h4>
+
+                    {collection.description && (
+                      <p className="mt-2 text-sm leading-6 text-[#101b18]/60">
+                        {collection.description}
+                      </p>
+                    )}
+
+                    {collection.details && (
+                      <p className="mt-2 text-xs text-[#174b32]">
+                        {collection.details}
+                      </p>
+                    )}
+
+                    <div className="mt-5 flex flex-wrap gap-3 border-t border-black/10 pt-4">
+                      <button
+                        type="button"
+                        onClick={() => handleEdit(collection)}
+                        className="text-[9px] uppercase tracking-[0.15em] text-[#174b32] underline"
+                      >
+                        Edit
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => toggleActive(collection)}
+                        className="text-[9px] uppercase tracking-[0.15em] underline"
+                      >
+                        {collection.is_active ? "Hide" : "Show"}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(collection)}
+                        className="text-[9px] uppercase tracking-[0.15em] text-red-700 underline"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
+      </div>
+    </main>
+  );
+}
+
 /* =========================================================
    APP ROUTER
 ========================================================= */
@@ -6233,6 +7031,10 @@ export default function App() {
   if (path === "/admin/products") {
     return <AdminProductsPage />;
   }
+
+  if (path === "/admin/collections") {
+  return <AdminCollectionsPage />;
+}
 
   if (path === "/admin/messages") {
   return <AdminMessagesPage />;
