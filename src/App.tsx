@@ -3431,7 +3431,7 @@ function HomePage() {
 
           <p className="mx-auto mt-8 max-w-xl text-sm leading-7 text-[#101b18]/55 sm:text-base">
 
-            Furniture | Oil &amp; Gas | Building &amp; Interior Decorations |  Construction | Architectural Design. <br/>
+            Furnitures | Oil &amp; Gas | Building &amp; Interior Decorations |  Constructions | Architectural Designs. <br/>
 
            We realize your dreams......
 
