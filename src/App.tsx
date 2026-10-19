@@ -531,14 +531,15 @@ function XIcon() {
    FOOTER
 ========================================================= */
 
-function Footer() {
-  console.log("FOOTER COMPONENT RENDERED");
 
+function Footer() {
   const [storeSettings, setStoreSettings] =
     useState<StoreSettings | null>(null);
 
   useEffect(() => {
-    const loadFooterSettings = async () => {
+    let mounted = true;
+
+    async function loadFooterSettings() {
       const { data, error } = await supabase
         .from("store_settings")
         .select("*")
@@ -550,17 +551,18 @@ function Footer() {
         return;
       }
 
-      console.log("Footer store settings:", data);
-      setStoreSettings(data as StoreSettings | null);
-    };
+      if (mounted) {
+        setStoreSettings(data as StoreSettings | null);
+      }
+    }
 
-    loadFooterSettings();
+    void loadFooterSettings();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  /*
-    These extra social fields are read safely even if your current
-    StoreSettings type has not been updated yet.
-  */
   const socialSettings = storeSettings as
     | (StoreSettings & {
         youtube_url?: string | null;
@@ -600,29 +602,30 @@ function Footer() {
   const hasSocialLinks = socialLinks.some((social) => social.url);
 
   return (
-    <footer className="bg-[#101b18] px-5 py-14 text-white sm:px-10 lg:px-16">
-      <div className="mx-auto max-w-[1280px]">
-
-        {/* =====================================================
-            MAIN FOOTER
-        ===================================================== */}
-
-        <div className="grid gap-14 border-b border-white/10 pb-12 md:grid-cols-2">
-
+    <footer
+      id="contact"
+      className="bg-[#0d2d20] px-6 py-16 text-white sm:px-10 lg:px-16"
+    >
+      <div className="mx-auto max-w-[1400px]">
+        {/* MAIN FOOTER */}
+        <div className="grid gap-12 border-b border-white/10 pb-12 md:grid-cols-[1fr_auto]">
           {/* BRAND */}
-
           <div>
             <Logo inverse />
 
             <p className="mt-5 text-sm font-medium tracking-wide text-white/70">
+              FOBCA LIMITED
+              <span className="mx-2 text-white/25">|</span>
+              RC No. 1816516
+            </p>
+
+            <p className="mt-2 text-sm font-medium tracking-wide text-white/70">
               We realize your dreams.
             </p>
 
             <p className="mt-3 max-w-sm text-sm leading-7 text-white/45">
               Premium Imported Furniture &amp; Home Solutions
             </p>
-
-            {/* ONLINE BUSINESS LOCATION */}
 
             <p className="mt-6 max-w-md text-[10px] uppercase leading-6 tracking-[0.13em] text-white/35">
               Lagos, Nigeria
@@ -633,94 +636,70 @@ function Footer() {
             </p>
           </div>
 
-          {/* LINKS */}
-
-          <div className="grid grid-cols-2 gap-10 sm:grid-cols-3">
-
-            {/* QUICK LINKS */}
-
-            <div className="flex flex-col gap-3">
-              <strong className="mb-2 text-[10px] uppercase tracking-[0.16em] text-white/35">
-                Quick Links
-              </strong>
-
-              <button
-                onClick={() => navigate("/")}
-                className="text-left text-sm text-white/65 transition hover:text-white"
-              >
-                Home
-              </button>
-
-              <button
-                onClick={() => {
-                  navigate("/");
-
-                  window.setTimeout(() => {
-                    document
-                      .querySelector("#about")
-                      ?.scrollIntoView({ behavior: "smooth" });
-                  }, 80);
-                }}
-                className="text-left text-sm text-white/65 transition hover:text-white"
-              >
-                About Us
-              </button>
+          {/* LINKS + CONTACT */}
+          <div className="grid grid-cols-2 gap-x-12 gap-y-10 sm:gap-x-20">
+            {/* EXPLORE */}
+            <div className="flex flex-col gap-4">
+              <span className="text-[9px] uppercase tracking-[0.2em] text-white/30">
+                Explore
+              </span>
 
               <button
                 onClick={() => navigate("/furniture")}
-                className="text-left text-sm text-white/65 transition hover:text-white"
+                className="text-left text-sm text-white/60 transition hover:text-white"
               >
-                Products
+                Furnitures
               </button>
 
               <button
-                onClick={() => {
-                  navigate("/");
-
-                  window.setTimeout(() => {
-                    document
-                      .querySelector("#departments")
-                      ?.scrollIntoView({ behavior: "smooth" });
-                  }, 80);
-                }}
-                className="text-left text-sm text-white/65 transition hover:text-white"
+                onClick={() => navigate("/energy")}
+                className="text-left text-sm text-white/60 transition hover:text-white"
               >
-                Services
+                Oil &amp; Gas
               </button>
 
               <button
-                onClick={() => {
-                  navigate("/");
-
-                  window.setTimeout(() => {
-                    document
-                      .querySelector("#contact")
-                      ?.scrollIntoView({ behavior: "smooth" });
-                  }, 80);
-                }}
-                className="text-left text-sm text-white/65 transition hover:text-white"
+                onClick={() => navigate("/building-interior")}
+                className="text-left text-sm text-white/60 transition hover:text-white"
               >
-                Contact Us
+                Building &amp; Interiors
+              </button>
+
+              <button
+                onClick={() => navigate("/construction")}
+                className="text-left text-sm text-white/60 transition hover:text-white"
+              >
+                Constructions
+              </button>
+
+              <button
+                onClick={() => navigate("/architecture")}
+                className="text-left text-sm text-white/60 transition hover:text-white"
+              >
+                Architectural Designs
               </button>
             </div>
 
             {/* CONTACT */}
+            <div className="flex flex-col gap-4">
+              <span className="text-[9px] uppercase tracking-[0.2em] text-white/30">
+                Contact
+              </span>
 
-            <div className="flex flex-col gap-3">
-              <strong className="mb-2 text-[10px] uppercase tracking-[0.16em] text-white/35">
-                Contact Us
-              </strong>
-
+              {/* PHONE */}
               {storeSettings?.phone && (
                 <a
                   href={`tel:${storeSettings.phone}`}
-                  className="flex items-center gap-2 text-sm text-white/65 transition hover:text-white"
+                  className="flex items-center gap-2 text-sm text-white/60 transition hover:text-white"
                 >
-                  <span className="text-xs text-white/40">☎</span>
+                  <span className="text-xs text-white/35" aria-hidden="true">
+                    ☎
+                  </span>
                   <span>{storeSettings.phone}</span>
                 </a>
               )}
 
+              {/* WHATSAPP */}
               {storeSettings?.whatsapp && (
                 <a
                   href={`https://wa.me/${storeSettings.whatsapp.replace(
@@ -729,64 +708,36 @@ function Footer() {
                   )}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex items-center gap-2 text-sm text-white/65 transition hover:text-white"
+                  className="flex items-center gap-2 text-sm text-white/60 transition hover:text-white"
                 >
-                  <span className="text-xs text-white/40">💬</span>
+                  <span className="text-xs text-white/35" aria-hidden="true">
+                    💬
+                  </span>
                   <span>WhatsApp</span>
                 </a>
               )}
 
+              {/* EMAIL */}
               {storeSettings?.email && (
                 <a
                   href={`mailto:${storeSettings.email}`}
-                  className="flex items-start gap-2 break-all text-sm text-white/65 transition hover:text-white"
+                  className="flex items-start gap-2 break-all text-sm text-white/60 transition hover:text-white"
                 >
-                  <span className="mt-0.5 shrink-0 text-xs text-white/40">
+                  <span
+                    className="mt-0.5 shrink-0 text-xs text-white/35"
+                    aria-hidden="true"
+                  >
                     ✉
                   </span>
-
                   <span>{storeSettings.email}</span>
                 </a>
               )}
 
-              {!storeSettings && (
-                <span className="text-sm text-white/40">
-                  Loading contact details...
-                </span>
-              )}
-
-              {storeSettings &&
-                !storeSettings.phone &&
-                !storeSettings.whatsapp &&
-                !storeSettings.email && (
-                  <span className="text-sm text-white/40">
-                    Contact details coming soon
-                  </span>
-                )}
-            </div>
-
-            {/* DELIVERY + SOCIAL */}
-
-            <div className="col-span-2 flex flex-col gap-7 sm:col-span-1">
-
-              {/* DELIVERY */}
-
-              <div>
-                <strong className="mb-3 block text-[10px] uppercase tracking-[0.16em] text-white/35">
-                  Delivery
-                </strong>
-
-                <p className="max-w-[180px] text-sm leading-6 text-white/65">
-                  Nationwide Delivery Available
-                </p>
-              </div>
-
               {/* SOCIAL MEDIA */}
-
-              <div>
-                <strong className="mb-3 block text-[10px] uppercase tracking-[0.16em] text-white/35">
+              <div className="mt-3">
+                <span className="mb-3 block text-[9px] uppercase tracking-[0.2em] text-white/30">
                   Follow Us
-                </strong>
+                </span>
 
                 {hasSocialLinks ? (
                   <div className="flex flex-wrap gap-2">
@@ -800,7 +751,7 @@ function Footer() {
                             rel="noreferrer"
                             aria-label={`Follow FOBCA Limited on ${social.name}`}
                             title={social.name}
-                            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-white/55 transition-all duration-300 hover:border-white/50 hover:bg-white hover:text-[#101b18]"
+                            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-white/55 transition-all duration-300 hover:border-white/50 hover:bg-white hover:text-[#0d2d20]"
                           >
                             {social.icon}
                           </a>
@@ -813,25 +764,45 @@ function Footer() {
                   </p>
                 )}
               </div>
+
+              {!storeSettings && (
+                <span className="text-sm text-white/35">
+                  Loading contact details...
+                </span>
+              )}
+
+              {storeSettings &&
+                !storeSettings.phone &&
+                !storeSettings.whatsapp &&
+                !storeSettings.email && (
+                  <span className="text-sm text-white/35">
+                    Contact details coming soon
+                  </span>
+                )}
             </div>
           </div>
         </div>
 
-        {/* =====================================================
-            BOTTOM BAR
-        ===================================================== */}
-
-        <div className="flex flex-col justify-between gap-3 pt-5 text-[9px] uppercase tracking-[0.15em] text-white/30 sm:flex-row">
+        {/* FOOTER BOTTOM */}
+        <div className="flex flex-col gap-3 pt-8 text-[9px] uppercase tracking-[0.2em] text-white/30 sm:flex-row sm:items-center sm:justify-between">
           <span>
             © {new Date().getFullYear()} Fobca Limited. All Rights Reserved.
           </span>
 
           <span>We realize your dreams.</span>
+
+          <button
+            onClick={() => navigate("/admin")}
+            className="text-left transition hover:text-white"
+          >
+            Admin
+          </button>
         </div>
       </div>
     </footer>
   );
 }
+
 
 /* =========================================================
    HOMEPAGE
@@ -3711,7 +3682,7 @@ function HomePage() {
 
                 >
 
-                  Furniture
+                  Furnitures
 
                 </button>
 
@@ -3733,7 +3704,7 @@ function HomePage() {
   onClick={() => navigate("/building-interior")}
   className="text-left text-sm text-white/60 transition hover:text-white"
 >
-  Building & Interior
+  Building & Interiors
 </button>
 
 
@@ -3746,7 +3717,7 @@ function HomePage() {
 
                 >
 
-                  Construction
+                  Constructions
 
                 </button>
 
@@ -3760,7 +3731,7 @@ function HomePage() {
 
                 >
 
-                  Architectural Design
+                  Architectural Designs
 
                 </button>
 
