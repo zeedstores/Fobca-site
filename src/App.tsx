@@ -818,6 +818,28 @@ function HomePage() {
 
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
 
+
+const handleWhatsAppEnquiry = (product: Product) => {
+  const phoneNumber = "2348022839548";
+
+  const price = `₦${Number(product.price).toLocaleString("en-NG")}`;
+
+  const message = [
+    "Hello Fobca, I'm interested in this furniture piece.",
+    "",
+    `Product: ${product.name}`,
+    `Category: ${product.category}`,
+    `Price: ${price}`,
+    "",
+    "Please share more details about this product. Thank you.",
+  ].join("\n");
+
+  const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+
+  window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+};
+
+
   const [storeSettings, setStoreSettings] =
 
     useState<StoreSettings | null>(null);
@@ -1253,7 +1275,7 @@ function HomePage() {
 
             >
 
-              Furniture
+              Furnitures
 
             </button>
 
@@ -1881,7 +1903,7 @@ function HomePage() {
 
                     <button
 
-                      onClick={() => navigate("/furniture")}
+                    onClick={() => handleWhatsAppEnquiry(product)}
 
                       className="mt-2 flex w-full items-center justify-between border border-[#101b18]/20 px-4 py-1 text-left transition-all duration-300 hover:border-[#174b32] hover:bg-[#174b32] hover:text-white"
 
@@ -4101,6 +4123,7 @@ function HomePage() {
 
 
 
+
 function FurnitureStorePage() {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
@@ -4113,6 +4136,30 @@ function FurnitureStorePage() {
   const [collectionsError, setCollectionsError] = useState<string | null>(
     null,
   );
+
+  /* =========================================================
+     WHATSAPP PRODUCT ENQUIRY
+  ========================================================= */
+
+  const handleWhatsAppEnquiry = (product: Product) => {
+    const phoneNumber = "2348022839548";
+
+    const price = `₦${Number(product.price).toLocaleString("en-NG")}`;
+
+    const message = [
+      "Hello Fobca, I'm interested in this furniture piece.",
+      "",
+      `Product: ${product.name}`,
+      `Category: ${product.category}`,
+      `Price: ${price}`,
+      "",
+      "Please share more details about this product. Thank you.",
+    ].join("\n");
+
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+
+    window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+  };
 
   /* =========================================================
      INITIAL CATEGORY
@@ -4156,61 +4203,60 @@ function FurnitureStorePage() {
     loadProducts();
   }, []);
 
- 
-/* =========================================================
-   LOAD COLLECTIONS FROM SUPABASE
-========================================================= */
+  /* =========================================================
+     LOAD COLLECTIONS FROM SUPABASE
+  ========================================================= */
 
-useEffect(() => {
-  const loadCollections = async () => {
-    setLoadingCollections(true);
-    setCollectionsError(null);
+  useEffect(() => {
+    const loadCollections = async () => {
+      setLoadingCollections(true);
+      setCollectionsError(null);
 
-    const { data, error } = await supabase
-      .from("collections")
-      .select(
-        "id, name, image, description, details, display_order, is_active",
-      )
-      .eq("is_active", true)
-      .order("display_order", { ascending: true });
+      const { data, error } = await supabase
+        .from("collections")
+        .select(
+          "id, name, image, description, details, display_order, is_active",
+        )
+        .eq("is_active", true)
+        .order("display_order", { ascending: true });
 
-    if (error) {
-      console.error("Error loading collections:", error);
+      if (error) {
+        console.error("Error loading collections:", error);
 
-      setCollections([]);
-      setCollectionsError(
-        "Collections could not be loaded. Please try again.",
+        setCollections([]);
+        setCollectionsError(
+          "Collections could not be loaded. Please try again.",
+        );
+        setLoadingCollections(false);
+        return;
+      }
+
+      const loadedCollections: StoreCollection[] = (data ?? []).map(
+        (collection) => {
+          const imageUrl = collection.image?.startsWith("http")
+            ? collection.image
+            : supabase.storage
+                .from("collection-images")
+                .getPublicUrl(collection.image || "").data.publicUrl;
+
+          return {
+            id: collection.id,
+            name: collection.name,
+            image: imageUrl,
+            description: collection.description,
+            details: collection.details,
+            display_order: collection.display_order,
+            is_active: collection.is_active,
+          };
+        },
       );
+
+      setCollections(loadedCollections);
       setLoadingCollections(false);
-      return;
-    }
+    };
 
-    const loadedCollections: StoreCollection[] = (data ?? []).map(
-      (collection) => {
-        const imageUrl = collection.image?.startsWith("http")
-          ? collection.image
-          : supabase.storage
-              .from("collection-images")
-              .getPublicUrl(collection.image || "").data.publicUrl;
-
-        return {
-          id: collection.id,
-          name: collection.name,
-          image: imageUrl,
-          description: collection.description,
-          details: collection.details,
-          display_order: collection.display_order,
-          is_active: collection.is_active,
-        };
-      },
-    );
-
-    setCollections(loadedCollections);
-    setLoadingCollections(false);
-  };
-
-  loadCollections();
-}, []);
+    loadCollections();
+  }, []);
 
   /* =========================================================
      FILTER PRODUCTS
@@ -4241,31 +4287,29 @@ useEffect(() => {
      COLLECTION CLICK
   ========================================================= */
 
-  
-const handleCollectionClick = (collectionName: string) => {
-  const categoryMap: Record<string, string> = {
-    Beds: "Bedroom",
-    Sofas: "Living Room",
-    Dining: "Dining",
-    "Adjustable Coffee Tables": "Living Room",
-    "Premium Shoe Racks": "Living Room",
-    "Rocking Chairs": "Living Room",
-    "Bedside Table Lamps": "Bedroom",
+  const handleCollectionClick = (collectionName: string) => {
+    const categoryMap: Record<string, string> = {
+      Beds: "Bedroom",
+      Sofas: "Living Room",
+      Dining: "Dining",
+      "Adjustable Coffee Tables": "Living Room",
+      "Premium Shoe Racks": "Living Room",
+      "Rocking Chairs": "Living Room",
+      "Bedside Table Lamps": "Bedroom",
+    };
+
+    const category = categoryMap[collectionName] ?? collectionName;
+
+    setActiveCategory(category);
+    setSearch("");
+
+    setTimeout(() => {
+      document.getElementById("store-products")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 50);
   };
-
-  const category = categoryMap[collectionName] ?? collectionName;
-
-  setActiveCategory(category);
-  setSearch("");
-
-  setTimeout(() => {
-    document.getElementById("store-products")?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
-  }, 50);
-};
-
 
   return (
     <>
@@ -4543,9 +4587,7 @@ const handleCollectionClick = (collectionName: string) => {
 
                     <button
                       type="button"
-                      onClick={() => {
-                        // Cart functionality comes next.
-                      }}
+                      onClick={() => handleWhatsAppEnquiry(product)}
                       className="group mt-4 flex items-center gap-2 text-[#174b32]"
                     >
                       <span className="text-[8px] uppercase tracking-[0.2em]">
@@ -4568,6 +4610,7 @@ const handleCollectionClick = (collectionName: string) => {
     </>
   );
 }
+
 
 
 /* =========================================================
